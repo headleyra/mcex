@@ -5,49 +5,45 @@ defmodule Mcex.Modifier.Urljson do
   @post_options [ssl: [{:versions, [:"tlsv1.2"]}], recv_timeout: 10_000]
 
   def modify(buffer, _args) do
-    map = request_map(buffer)
-
-    case check(map) do
-      :ok ->
-        case method(map) do
+    case Jason.decode(buffer) do
+      {:ok, map} ->
+        case method_from(map) do
           "get" ->
-            url(map)
-            |> HTTPoison.get(headers(map), @get_options)
+            url_from(map)
+            |> HTTPoison.get(headers_from(map), @get_options)
             |> reply_for()
 
           "post" ->
-            url(map)
-            |> HTTPoison.post(body(map), headers(map), @post_options)
+            url_from(map)
+            |> HTTPoison.post(body_from(map), headers_from(map), @post_options)
             |> reply_for()
+
+          _bad_method ->
+            oops(:modify, "bad method")
         end
 
-      bad_json_error ->
-        bad_json_error
+      {:error, _reason} ->
+        oops(:modify, "bad JSON")
     end
   end
 
   def request_map(buffer) do
-    {:ok, json_with_replacements} = Mc.Modifier.Buffer.modify("", buffer)
-    Jason.decode!(json_with_replacements)
+    Jason.decode!(buffer)
   end
 
-  def check(_map) do
-    :ok
-  end
-
-  def method(map) do
+  def method_from(map) do
     Map.get(map, "method")
   end
 
-  def url(map) do
+  def url_from(map) do
     Map.get(map, "url")
   end
 
-  def body(map) do
+  def body_from(map) do
     Map.get(map, "body")
   end
 
-  def headers(map) do
+  def headers_from(map) do
     Map.get(map, "headers")
     |> Enum.map(fn %{"name" => name, "value" => value} -> {name, value} end)
     |> List.insert_at(0, {"user-agent", @user_agent})
@@ -62,13 +58,13 @@ defmodule Mcex.Modifier.Urljson do
         {:ok, body}
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
-        {:error, "404 (not found)"}
+        oops(:reply_for, "404 (not found)")
 
       {:ok, %HTTPoison.Response{body: body}} ->
-        {:error, body}
+        oops(:reply_for, body)
 
       {:error, %HTTPoison.Error{reason: reason}} ->
-        {:error, reason}
+        oops(:reply_for, inspect(reason))
     end
   end
 end
