@@ -30,8 +30,8 @@ defmodule Mcex.MixProject do
       {:mc, git: "git://github.com/headleyra/mc.git"},
 
       # Redis
-      {:redix, "~> 1.0.0"},
-      {:castore, "~> 0.1.9"}
+      {:redix, "~> 1.1"},
+      {:castore, "~> 0.1"}
 
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
