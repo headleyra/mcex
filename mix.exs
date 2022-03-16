@@ -4,7 +4,7 @@ defmodule Mcex.MixProject do
   def project do
     [
       app: :mcex,
-      version: "0.11.0",
+      version: "0.11.1",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -25,7 +25,7 @@ defmodule Mcex.MixProject do
       {:tesla, "~> 1.3"},
 
       # Mc
-      {:mc, git: "git://github.com/headleyra/mc.git"},
+      {:mc, git: "https://github.com/headleyra/mc.git"},
 
       # Redis
       {:redix, "~> 1.1"},
