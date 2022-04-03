@@ -11,6 +11,7 @@ defmodule Mcex.Mappings do
     urlalt: {Mcex.Modifier.Urlalt, :modify},
     urljs: {Mcex.Modifier.Urljs, :modify},
     urljson: {Mcex.Modifier.Urljson, :modify},
-    uuid: {Mcex.Modifier.Uuid, :modify}
+    uuid: {Mcex.Modifier.Uuid, :modify},
+    select: {Mcex.Modifier.Select, :modify}
   ]
 end
