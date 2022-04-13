@@ -29,7 +29,7 @@ defmodule Mcex.Modifier.Select do
   end
 
   def int_from(int_str) do
-    case Mc.Util.Math.str2int(int_str) do
+    case Mc.Math.str2int(int_str) do
       {:ok, int} when is_integer(int) and int > 0 ->
         int - 1
 

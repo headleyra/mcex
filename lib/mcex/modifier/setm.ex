@@ -9,7 +9,7 @@ defmodule Mcex.Modifier.Setm do
   def setm(buffer, separator), do: setm_(buffer, separator)
 
   def setm_(buffer, separator) do
-    case Mc.Util.InlineString.uri_decode(separator) do
+    case Mc.InlineString.uri_decode(separator) do
       {:ok, decoded_separator} ->
         String.split(buffer, decoded_separator)
         |> parse()
