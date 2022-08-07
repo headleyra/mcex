@@ -9,7 +9,7 @@ defmodule Mcex.Modifier.Getm do
   def getm(buffer, separator), do: getm_(buffer, separator)
 
   def getm_(buffer, separator) do
-    case Mc.InlineString.uri_decode(separator) do
+    case Mc.String.Inline.uri_decode(separator) do
       {:ok, decoded_separator} ->
         result =
           buffer
