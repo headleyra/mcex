@@ -10,8 +10,6 @@ defmodule Mcex.Mappings do
     sleep: {Mcex.Modifier.Sleep, :modify},
     time: {Mcex.Modifier.Time, :modify},
     trap: {Mcex.Modifier.Trap, :modify},
-    urlalt: {Mcex.Modifier.Urlalt, :modify},
-    urljs: {Mcex.Modifier.Urljs, :modify},
     urljson: {Mcex.Modifier.Urljson, :modify},
     uuid: {Mcex.Modifier.Uuid, :modify}
   ]

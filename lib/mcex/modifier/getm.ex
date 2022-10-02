@@ -2,26 +2,25 @@ defmodule Mcex.Modifier.Getm do
   use Mc.Railway, [:modify]
 
   def modify(buffer, args) do
-    getm(buffer, args)
+    get_multiple(buffer, args)
   end
 
-  def getm(buffer, ""), do: getm_(buffer, "\n---\n")
-  def getm(buffer, separator), do: getm_(buffer, separator)
+  defp get_multiple(buffer, ""), do: expand(buffer, "\n---\n")
+  defp get_multiple(buffer, separator), do: expand(buffer, separator)
 
-  def getm_(buffer, separator) do
-    case Mc.String.Inline.uri_decode(separator) do
+  defp expand(buffer, separator) do
+    case Mc.Uri.decode(separator) do
       {:ok, decoded_separator} ->
-        result =
+        {:ok,
           buffer
           |> String.split()
           |> Enum.map(fn key -> {key, Mc.modify("", "get #{key}")} end)
           |> Enum.map(fn {key, {:ok, value}} -> "#{key}\n#{value}" end)
           |> Enum.join(decoded_separator)
-
-        {:ok, result}
+        }
 
       _error ->
-        usage(:modify, "[<uri encoded separator>]")
+        oops(:modify, "bad URI separator")
     end
   end
 end

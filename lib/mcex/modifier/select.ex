@@ -3,19 +3,24 @@ defmodule Mcex.Modifier.Select do
 
   def modify(buffer, args) do
     buffer_lines = String.split(buffer, "\n")
+    line_specs = line_specs_from(args)
 
-    result =
-      String.split(args)
-      |> Enum.map(fn line_spec -> parse(line_spec) end)
-      |> List.flatten()
-      |> Enum.reduce([], fn line, acc -> [Enum.at(buffer_lines, line) | acc] end)
-      |> Enum.reverse()
-      |> Enum.join("\n")
+    if Enum.any?(line_specs, fn line_spec -> line_spec == :error end) do
+      oops(:modify, "bad line spec(s)")
+    else
+      {:ok,
+        line_specs
+        |> List.flatten()
+        |> Enum.reduce([], fn line, acc -> [Enum.at(buffer_lines, line) | acc] end)
+        |> Enum.reverse()
+        |> Enum.join("\n")
+      }
+    end
+  end
 
-    {:ok, result}
-  rescue
-    FunctionClauseError ->
-      usage(:modify, "<line spec> ...")
+  defp line_specs_from(args) do
+    String.split(args)
+    |> Enum.map(fn line_spec -> parse(line_spec) end)
   end
 
   def parse(line_spec) do
@@ -29,8 +34,8 @@ defmodule Mcex.Modifier.Select do
   end
 
   def int_from(int_str) do
-    case Mc.Math.str2int(int_str) do
-      {:ok, int} when is_integer(int) and int > 0 ->
+    case Mc.String.to_int(int_str) do
+      {:ok, int} when int > 0 ->
         int - 1
 
       _error ->

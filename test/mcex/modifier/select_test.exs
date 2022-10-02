@@ -10,13 +10,14 @@ defmodule Mcex.Modifier.SelectTest do
       assert Select.modify("\n\none\ntwo\nthree\n\n", "5 3") == {:ok, "three\none"}
       assert Select.modify("one\ntwo\nthree\nfour", "2-4") == {:ok, "two\nthree\nfour"}
       assert Select.modify("one\ntwo\nthree\nfour\nfive", "1 3-5 1") == {:ok, "one\nthree\nfour\nfive\none"}
+      assert Select.modify("one\ntwo\nthree\nfour\nfive", "3-1 5") == {:ok, "three\ntwo\none\nfive"}
     end
 
     test "errors given 'bad' line specs" do
-      assert Select.modify("one\ntwo", "0") == {:error, "usage: Mcex.Modifier.Select#modify <line spec> ..."}
-      assert Select.modify("one\ntwo", "0-3") == {:error, "usage: Mcex.Modifier.Select#modify <line spec> ..."}
-      assert Select.modify("one\ntwo", "oops") == {:error, "usage: Mcex.Modifier.Select#modify <line spec> ..."}
-      assert Select.modify("one\ntwo", "1 0-5") == {:error, "usage: Mcex.Modifier.Select#modify <line spec> ..."}
+      assert Select.modify("one\ntwo", "0") == {:error, "Mcex.Modifier.Select#modify: bad line spec(s)"}
+      assert Select.modify("one\ntwo", "0-3") == {:error, "Mcex.Modifier.Select#modify: bad line spec(s)"}
+      assert Select.modify("one\ntwo", "oops") == {:error, "Mcex.Modifier.Select#modify: bad line spec(s)"}
+      assert Select.modify("one\ntwo", "1 0-5") == {:error, "Mcex.Modifier.Select#modify: bad line spec(s)"}
     end
 
     test "works with ok tuples" do
