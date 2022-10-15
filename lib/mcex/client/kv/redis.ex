@@ -16,16 +16,23 @@ defmodule Mcex.Client.Kv.Redis do
   end
 
   @impl true
-  def findk(pattern) do
-    {:ok,
-      keys(pattern)
-      |> Enum.join("\n")
-    }
+  def findk(regex_string) do
+    case Regex.compile(regex_string) do
+      {:ok, regex} ->
+        {:ok,
+          keys("*")
+          |> Enum.filter(fn key -> Regex.match?(regex, key) end)
+          |> Enum.join("\n")
+        }
+
+      {:error, _} ->
+        {:error, "bad regex"}
+    end
   end
 
   @impl true
-  def findv(regex_str) do
-    case Regex.compile(regex_str) do
+  def findv(regex_string) do
+    case Regex.compile(regex_string) do
       {:ok, regex} ->
         {:ok,
           keys("*")
