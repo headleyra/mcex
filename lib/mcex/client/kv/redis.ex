@@ -16,18 +16,11 @@ defmodule Mcex.Client.Kv.Redis do
   end
 
   @impl true
-  def findk(regex_str) do
-    case Regex.compile(regex_str) do
-      {:ok, regex} ->
-        {:ok,
-          allkeys()
-          |> Enum.filter(fn key -> Regex.match?(regex, key) end)
-          |> Enum.join("\n")
-        }
-
-      {:error, _} ->
-        {:error, "bad regex"}
-    end
+  def findk(pattern) do
+    {:ok,
+      keys(pattern)
+      |> Enum.join("\n")
+    }
   end
 
   @impl true
@@ -35,7 +28,7 @@ defmodule Mcex.Client.Kv.Redis do
     case Regex.compile(regex_str) do
       {:ok, regex} ->
         {:ok,
-          allkeys()
+          keys("*")
           |> Enum.map(fn key -> {key, get(key)} end)
           |> Enum.filter(fn {_key, {:ok, value}} -> Regex.match?(regex, value) end)
           |> Enum.map(fn {key, {:ok, _value}} -> key end)
@@ -47,8 +40,8 @@ defmodule Mcex.Client.Kv.Redis do
     end
   end
 
-  defp allkeys do
-    {:ok, result_list} = Redix.command(:redix, ["KEYS", "*"])
-    result_list
+  defp keys(pattern) do
+    {:ok, list} = Redix.command(:redix, ["KEYS", pattern])
+    list
   end
 end
