@@ -19,7 +19,7 @@ defmodule Mcex.Modifier.Select do
   end
 
   defp line_specs_from(args) do
-    String.split(args)
+    String.split(args, ",")
     |> Enum.map(fn line_spec -> parse(line_spec) end)
   end
 
