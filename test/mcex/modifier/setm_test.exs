@@ -7,9 +7,9 @@ defmodule Mcex.Modifier.SetmTest do
   alias Mcex.Modifier.Setm
 
   setup do
-    start_supervised({Memory, map: %{}})
-    start_supervised({Get, kv_client: Memory})
-    start_supervised({Set, kv_client: Memory})
+    start_supervised({Memory, map: %{}, name: :mem})
+    start_supervised({Get, kv_client: Memory, kv_pid: :mem})
+    start_supervised({Set, kv_client: Memory, kv_pid: :mem})
     start_supervised({Mc, mappings: %Mc.Mappings{}})
     :ok
   end

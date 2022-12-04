@@ -5,8 +5,8 @@ defmodule Mcex.Modifier.GetmTest do
   alias Mcex.Modifier.Getm
 
   setup do
-    start_supervised({Memory, map: %{"key1" => "data one", "key2" => "value\ntwo\n"}})
-    start_supervised({Get, kv_client: Memory})
+    start_supervised({Memory, map: %{"key1" => "data one", "key2" => "value\ntwo\n"}, name: :mem})
+    start_supervised({Get, kv_client: Memory, kv_pid: :mem})
     start_supervised({Mc, mappings: %Mc.Mappings{}})
     :ok
   end
