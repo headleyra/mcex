@@ -2,25 +2,25 @@ defmodule Mcex.Client.Kv.Redis do
   @behaviour Mc.Behaviour.KvClient
 
   @impl true
-  def get(key) do
-    case Redix.command(:redix, ["GET", key]) do
+  def get(pid, key) do
+    case Redix.command(pid, ["GET", key]) do
       {:ok, nil} -> {:ok, ""}
       tuple -> tuple
     end
   end
 
   @impl true
-  def set(key, value) do
-    Redix.command(:redix, ["SET", key, value])
+  def set(pid, key, value) do
+    Redix.command(pid, ["SET", key, value])
     {:ok, value}
   end
 
   @impl true
-  def findk(regex_string) do
+  def findk(pid, regex_string) do
     case Regex.compile(regex_string) do
       {:ok, regex} ->
         {:ok,
-          keys("*")
+          keys(pid, "*")
           |> Enum.filter(fn key -> Regex.match?(regex, key) end)
           |> Enum.join("\n")
         }
@@ -31,12 +31,12 @@ defmodule Mcex.Client.Kv.Redis do
   end
 
   @impl true
-  def findv(regex_string) do
+  def findv(pid, regex_string) do
     case Regex.compile(regex_string) do
       {:ok, regex} ->
         {:ok,
-          keys("*")
-          |> Enum.map(fn key -> {key, get(key)} end)
+          keys(pid, "*")
+          |> Enum.map(fn key -> {key, get(pid, key)} end)
           |> Enum.filter(fn {_key, {:ok, value}} -> Regex.match?(regex, value) end)
           |> Enum.map(fn {key, {:ok, _value}} -> key end)
           |> Enum.join("\n")
@@ -47,8 +47,8 @@ defmodule Mcex.Client.Kv.Redis do
     end
   end
 
-  defp keys(pattern) do
-    {:ok, list} = Redix.command(:redix, ["KEYS", pattern])
+  defp keys(pid, pattern) do
+    {:ok, list} = Redix.command(pid, ["KEYS", pattern])
     list
   end
 end
