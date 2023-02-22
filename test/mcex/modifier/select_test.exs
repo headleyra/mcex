@@ -2,7 +2,7 @@ defmodule Mcex.Modifier.SelectTest do
   use ExUnit.Case, async: true
   alias Mcex.Modifier.Select
 
-  describe "Mcex.Modifier.Select.modify/2" do
+  describe "modify/2" do
     test "selects lines from `buffer` using a series of comma-seperated 'line specs'" do
       assert Select.modify("one\ntwo\nthree", "2") == {:ok, "two"}
       assert Select.modify("one\ntwo\nthree", "3") == {:ok, "three"}
@@ -35,7 +35,7 @@ defmodule Mcex.Modifier.SelectTest do
     end
   end
 
-  describe "Mcex.Modifier.Select.parse/1" do
+  describe "parse/1" do
     test "parses a line spec" do
       assert Select.parse("1") == 0
       assert Select.parse("5") == 4
@@ -52,7 +52,7 @@ defmodule Mcex.Modifier.SelectTest do
     end
   end
 
-  describe "Mcex.Modifier.Select.int_from/1" do
+  describe "int_from/1" do
     test "converts an integer string into a zero-based integer" do
       assert Select.int_from("1") == 0
       assert Select.int_from("8") == 7
@@ -64,7 +64,7 @@ defmodule Mcex.Modifier.SelectTest do
     end
   end
 
-  describe "Mcex.Modifier.Select.int_from/2" do
+  describe "int_from/2" do
     test "converts two integer strings into a zero-based integer list" do
       assert Select.int_from("1", "3") == [0, 1, 2]
       assert Select.int_from("8", "5") == [7, 6, 5, 4]

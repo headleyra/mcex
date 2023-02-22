@@ -1,17 +1,17 @@
 defmodule Mcex.Modifier.GetmTest do
   use ExUnit.Case, async: false
-  alias Mc.Client.Kv.Memory
+  alias Mc.Adapter.KvMemory
   alias Mc.Modifier.Get
   alias Mcex.Modifier.Getm
 
   setup do
-    start_supervised({Memory, map: %{"key1" => "data one", "key2" => "value\ntwo\n"}, name: :mem})
-    start_supervised({Get, kv_client: Memory, kv_pid: :mem})
+    start_supervised({KvMemory, map: %{"key1" => "data one", "key2" => "value\ntwo\n"}, name: :mem})
+    start_supervised({Get, kv_pid: :mem})
     start_supervised({Mc, mappings: %Mc.Mappings{}})
     :ok
   end
 
-  describe "Mc.Modifier.Getm.modify/2" do
+  describe "modify/2" do
     test "parses the `buffer` as a set of whitespace-separated keys and expands them into 'setm' format" do
       assert Getm.modify("key1", "") == {:ok, "key1\ndata one"}
       assert Getm.modify("key1 key2", "") == {:ok, "key1\ndata one\n---\nkey2\nvalue\ntwo\n"}

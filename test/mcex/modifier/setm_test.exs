@@ -1,20 +1,20 @@
 defmodule Mcex.Modifier.SetmTest do
   use ExUnit.Case, async: false
-  alias Mc.Client.Kv.Memory
+  alias Mc.Adapter.KvMemory
   alias Mc.Modifier.Get
   alias Mc.Modifier.Set
   alias Mcex.Modifier.Getm
   alias Mcex.Modifier.Setm
 
   setup do
-    start_supervised({Memory, map: %{}, name: :mem})
-    start_supervised({Get, kv_client: Memory, kv_pid: :mem})
-    start_supervised({Set, kv_client: Memory, kv_pid: :mem})
+    start_supervised({KvMemory, map: %{}, name: :mem})
+    start_supervised({Get, kv_pid: :mem})
+    start_supervised({Set, kv_pid: :mem})
     start_supervised({Mc, mappings: %Mc.Mappings{}})
     :ok
   end
 
-  describe "Mc.Modifier.Setm.modify/2" do
+  describe "modify/2" do
     test "parses the `buffer` as 'setm' format and sets keys/values as appropriate" do
       Setm.modify("key\nvalue", "")
       assert Get.modify("", "key") == {:ok, "value"}

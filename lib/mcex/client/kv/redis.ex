@@ -1,5 +1,5 @@
 defmodule Mcex.Client.Kv.Redis do
-  @behaviour Mc.Behaviour.KvClient
+  @behaviour Mc.Behaviour.KvAdapter
 
   @impl true
   def get(pid, key) do

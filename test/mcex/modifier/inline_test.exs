@@ -7,7 +7,7 @@ defmodule Mcex.Modifier.InlineTest do
     :ok
   end
 
-  describe "Mcex.Modifier.Inline.modify/2" do
+  describe "modify/2" do
     test "expands `buffer` as an 'inline string'" do
       assert Inline.modify("just normal stuff", "") == {:ok, "just normal stuff"}
       assert Inline.modify("will split into; lines", "") == {:ok, "will split into\nlines"}
