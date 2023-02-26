@@ -1,4 +1,4 @@
-defmodule Mcex.Client.Kv.Redis do
+defmodule Mcex.Adapter.KvRedis do
   @behaviour Mc.Behaviour.KvAdapter
 
   @impl true
