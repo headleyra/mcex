@@ -53,22 +53,22 @@ defmodule Mcex.Adapter.KvPostgresCache do
   def set(key, value) do
     upsert = "ON CONFLICT(key) DO UPDATE SET key = $1, value = $2"
     Postgrex.query(@db_pid, "INSERT INTO #{state().db_table} (key, value) VALUES ($1, $2) #{upsert}", [key, value])
-    Agent.update(__MODULE__, fn state -> update_cache(state, key, value) end)
+    Agent.update(@state_pid, fn state -> update_cache(state, key, value) end)
     {:ok, value}
   end
 
   @impl true
   def findk(regex_str) do
-    tupleize_regex_query(["key", regex_str])
+    tupleize_regex_query("key", [regex_str])
   end
 
   @impl true
   def findv(regex_str) do
-    tupleize_regex_query(["value", regex_str])
+    tupleize_regex_query("value", [regex_str])
   end
 
-  defp tupleize_regex_query(vars) do
-    case Postgrex.query(@db_pid, "SELECT * FROM #{state().db_table} WHERE $1 ~ $2", vars) do
+  defp tupleize_regex_query(key_or_value, vars) do
+    case Postgrex.query(@db_pid, "SELECT * FROM #{state().db_table} WHERE #{key_or_value} ~ $1", vars) do
       {:ok, %Postgrex.Result{num_rows: row_count, rows: rows_list}} when row_count > 0 ->
         tupleize_rows_list(rows_list)
 
