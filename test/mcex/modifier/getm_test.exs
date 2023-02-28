@@ -1,12 +1,10 @@
 defmodule Mcex.Modifier.GetmTest do
   use ExUnit.Case, async: false
   alias Mc.Adapter.KvMemory
-  alias Mc.Modifier.Get
   alias Mcex.Modifier.Getm
 
   setup do
-    start_supervised({KvMemory, map: %{"key1" => "data one", "key2" => "value\ntwo\n"}, name: :mem})
-    start_supervised({Get, kv_pid: :mem})
+    start_supervised({KvMemory, map: %{"key1" => "data one", "key2" => "value\ntwo\n"}})
     start_supervised({Mc, mappings: %Mc.Mappings{}})
     :ok
   end

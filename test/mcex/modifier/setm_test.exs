@@ -2,14 +2,11 @@ defmodule Mcex.Modifier.SetmTest do
   use ExUnit.Case, async: false
   alias Mc.Adapter.KvMemory
   alias Mc.Modifier.Get
-  alias Mc.Modifier.Set
   alias Mcex.Modifier.Getm
   alias Mcex.Modifier.Setm
 
   setup do
-    start_supervised({KvMemory, map: %{}, name: :mem})
-    start_supervised({Get, kv_pid: :mem})
-    start_supervised({Set, kv_pid: :mem})
+    start_supervised({KvMemory, map: %{}})
     start_supervised({Mc, mappings: %Mc.Mappings{}})
     :ok
   end
