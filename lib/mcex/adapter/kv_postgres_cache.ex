@@ -10,10 +10,10 @@ defmodule Mcex.Adapter.KvPostgresCache do
 
   def start_link(opts \\ []) do
     Postgrex.start_link(
-      hostname: Keyword.fetch!(opts, :host),
-      username: Keyword.fetch!(opts, :user),
-      password: Keyword.fetch!(opts, :pwd),
-      database: Keyword.fetch!(opts, :db),
+      hostname: Keyword.fetch!(opts, :hostname),
+      username: Keyword.fetch!(opts, :username),
+      password: Keyword.fetch!(opts, :password),
+      database: Keyword.fetch!(opts, :database),
       queue_target: @queue_target,
       queue_interval: @queue_interval,
       name: @db_pid
