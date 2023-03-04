@@ -6,7 +6,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   @queue_target 200
   @queue_interval 4_000
   @db_pid __MODULE__
-  @state_pid Module.concat(__MODULE__, State)
+  @me Module.concat(__MODULE__, Me)
 
   def start_link(opts \\ []) do
     Postgrex.start_link(
@@ -20,27 +20,20 @@ defmodule Mcex.Adapter.KvPostgresCache do
     )
 
     cache = Keyword.fetch!(opts, :cache)
-    db_table = Keyword.fetch!(opts, :db_table)
-    Agent.start_link(fn -> %{cache: cache, db_table: db_table} end, name: @state_pid)
-  end
-
-  def get_cache do
-    {:ok,
-      Map.keys(state().cache)
-      |> Enum.join("\n")
-    }
+    table = Keyword.fetch!(opts, :table)
+    Agent.start_link(fn -> %{cache: cache, table: table} end, name: @me)
   end
 
   @impl true
   def get(key) do
-    if Map.has_key?(state().cache, key) do
-      {:ok, Map.get(state().cache, key)}
+    if Map.has_key?(cache(), key) do
+      {:ok, Map.get(cache(), key)}
     else
       Logger.info("===== CACHE MISS: #{key}")
 
       case db_get(key) do
         {:ok, value} ->
-          Agent.update(@state_pid, fn state -> update_cache(state, key, value) end)
+          Agent.update(@me, fn x -> update_cache(x, key, value) end)
           {:ok, value}
 
         {:error, reason} ->
@@ -52,8 +45,8 @@ defmodule Mcex.Adapter.KvPostgresCache do
   @impl true
   def set(key, value) do
     upsert = "ON CONFLICT(key) DO UPDATE SET key = $1, value = $2"
-    Postgrex.query(@db_pid, "INSERT INTO #{state().db_table} (key, value) VALUES ($1, $2) #{upsert}", [key, value])
-    Agent.update(@state_pid, fn state -> update_cache(state, key, value) end)
+    Postgrex.query!(@db_pid, "INSERT INTO #{table()} (key, value) VALUES ($1, $2) #{upsert}", [key, value])
+    Agent.update(@me, fn state -> update_cache(state, key, value) end)
     {:ok, value}
   end
 
@@ -67,8 +60,21 @@ defmodule Mcex.Adapter.KvPostgresCache do
     tupleize_regex_query("value", [regex_str])
   end
 
+  def create_table do
+    Logger.info("create table =======")
+    result = Postgrex.query!(@db_pid, "CREATE TABLE #{table()} (key VARCHAR(32) PRIMARY KEY, value TEXT)", [])
+    Logger.info(result)
+  end
+
+  def get_cache do
+    {:ok,
+      Map.keys(cache())
+      |> Enum.join("\n")
+    }
+  end
+
   defp tupleize_regex_query(key_or_value, vars) do
-    case Postgrex.query(@db_pid, "SELECT * FROM #{state().db_table} WHERE #{key_or_value} ~ $1", vars) do
+    case Postgrex.query(@db_pid, "SELECT * FROM #{table()} WHERE #{key_or_value} ~ $1", vars) do
       {:ok, %Postgrex.Result{num_rows: row_count, rows: rows_list}} when row_count > 0 ->
         tupleize_rows_list(rows_list)
 
@@ -86,7 +92,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   end
 
   defp db_get(key) do
-    case Postgrex.query(@db_pid, "SELECT * FROM #{state().db_table} WHERE key = $1", [key]) do
+    case Postgrex.query(@db_pid, "SELECT * FROM #{table()} WHERE key = $1", [key]) do
       {:ok, %Postgrex.Result{num_rows: 1, rows: [[_key, value]]}} ->
         {:ok, value}
 
@@ -108,9 +114,9 @@ defmodule Mcex.Adapter.KvPostgresCache do
     end
   end
 
-  defp state do
-    Agent.get(@state_pid, &(&1))
-  end
+  defp me, do: Agent.get(@me, &(&1))
+  defp table, do: me().table
+  defp cache, do: me().cache
 
   defp update_cache(%{cache: cache} = state, key, new_value) do
     {_, new_cache} = Map.get_and_update(cache, key, fn current_value -> {current_value, new_value} end)
