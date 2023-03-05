@@ -5,7 +5,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   @behaviour Mc.Behaviour.KvAdapter
   @queue_target 200
   @queue_interval 4_000
-  @db_pid __MODULE__
+  @db __MODULE__
   @me Module.concat(__MODULE__, Me)
 
   def start_link(opts \\ []) do
@@ -16,7 +16,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
       database: Keyword.fetch!(opts, :database),
       queue_target: @queue_target,
       queue_interval: @queue_interval,
-      name: @db_pid
+      name: @db
     )
 
     cache = Keyword.fetch!(opts, :cache)
@@ -45,7 +45,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   @impl true
   def set(key, value) do
     upsert = "ON CONFLICT(key) DO UPDATE SET key = $1, value = $2"
-    Postgrex.query!(@db_pid, "INSERT INTO #{table()} (key, value) VALUES ($1, $2) #{upsert}", [key, value])
+    Postgrex.query!(@db, "INSERT INTO #{table()} (key, value) VALUES ($1, $2) #{upsert}", [key, value])
     Agent.update(@me, fn state -> update_cache(state, key, value) end)
     {:ok, value}
   end
@@ -62,12 +62,12 @@ defmodule Mcex.Adapter.KvPostgresCache do
 
   def create_table do
     Logger.info("create table =======")
-    result = Postgrex.query!(@db_pid, "CREATE TABLE #{table()} (key VARCHAR(32) PRIMARY KEY, value TEXT)", [])
+    result = Postgrex.query!(@db, "CREATE TABLE #{table()} (key VARCHAR(32) PRIMARY KEY, value TEXT)", [])
     Logger.info(result)
   end
 
   def delete(key) do
-    case Postgrex.query(@db_pid, "DELETE FROM #{table()} WHERE key = $1", [key]) do
+    case Postgrex.query(@db, "DELETE FROM #{table()} WHERE key = $1", [key]) do
       {:ok, %Postgrex.Result{num_rows: num_rows}} ->
         {:ok, num_rows}
 
@@ -84,7 +84,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   end
 
   defp tupleize_regex_query(key_or_value, vars) do
-    case Postgrex.query(@db_pid, "SELECT * FROM #{table()} WHERE #{key_or_value} ~ $1", vars) do
+    case Postgrex.query(@db, "SELECT * FROM #{table()} WHERE #{key_or_value} ~ $1", vars) do
       {:ok, %Postgrex.Result{num_rows: row_count, rows: rows_list}} when row_count > 0 ->
         tupleize_rows_list(rows_list)
 
@@ -102,7 +102,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   end
 
   defp db_get(key) do
-    case Postgrex.query(@db_pid, "SELECT * FROM #{table()} WHERE key = $1", [key]) do
+    case Postgrex.query(@db, "SELECT * FROM #{table()} WHERE key = $1", [key]) do
       {:ok, %Postgrex.Result{num_rows: 1, rows: [[_key, value]]}} ->
         {:ok, value}
 
