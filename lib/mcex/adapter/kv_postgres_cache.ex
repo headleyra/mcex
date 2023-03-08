@@ -5,8 +5,9 @@ defmodule Mcex.Adapter.KvPostgresCache do
   @behaviour Mc.Behaviour.KvAdapter
   @queue_target 200
   @queue_interval 4_000
-  @db __MODULE__
-  @me Module.concat(__MODULE__, Me)
+  @cache_pid Module.concat(__MODULE__, Cache)
+  @db_pid __MODULE__
+  @db_table Application.compile_env(:mcex, KvPostgresCache)[:db_table]
 
   def start_link(opts \\ []) do
     Postgrex.start_link(
@@ -16,12 +17,11 @@ defmodule Mcex.Adapter.KvPostgresCache do
       database: Keyword.fetch!(opts, :database),
       queue_target: @queue_target,
       queue_interval: @queue_interval,
-      name: @db
+      name: @db_pid
     )
 
     cache = Keyword.fetch!(opts, :cache)
-    table = Keyword.fetch!(opts, :table)
-    Agent.start_link(fn -> %{cache: cache, table: table} end, name: @me)
+    Agent.start_link(fn -> cache end, name: @cache_pid)
   end
 
   @impl true
@@ -33,7 +33,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
 
       case db_get(key) do
         {:ok, value} ->
-          Agent.update(@me, fn x -> update_cache(x, key, value) end)
+          Agent.update(@cache_pid, fn cache -> Map.put(cache, key, value) end)
           {:ok, value}
 
         {:error, reason} ->
@@ -45,8 +45,8 @@ defmodule Mcex.Adapter.KvPostgresCache do
   @impl true
   def set(key, value) do
     upsert = "ON CONFLICT(key) DO UPDATE SET key = $1, value = $2"
-    Postgrex.query!(@db, "INSERT INTO #{table()} (key, value) VALUES ($1, $2) #{upsert}", [key, value])
-    Agent.update(@me, fn state -> update_cache(state, key, value) end)
+    Postgrex.query!(@db_pid, "INSERT INTO #{@db_table} (key, value) VALUES ($1, $2) #{upsert}", [key, value])
+    Agent.update(@cache_pid, fn cache -> Map.put(cache, key, value) end)
     {:ok, value}
   end
 
@@ -60,15 +60,22 @@ defmodule Mcex.Adapter.KvPostgresCache do
     tupleize_regex_query("value", [regex_str])
   end
 
+  def cache, do: Agent.get(@cache_pid, &(&1))
+
+  def clear_cache(key) do
+    Agent.update(@cache_pid, fn cache -> Map.delete(cache, key) end)
+  end
+
   def create_table do
-    Logger.info("create table =======")
-    result = Postgrex.query!(@db, "CREATE TABLE #{table()} (key VARCHAR(32) PRIMARY KEY, value TEXT)", [])
+    Logger.info("======= create table")
+    result = Postgrex.query!(@db_pid, "CREATE TABLE #{@db_table} (key VARCHAR(32) PRIMARY KEY, value TEXT)", [])
     Logger.info(result)
   end
 
   def delete(key) do
-    case Postgrex.query(@db, "DELETE FROM #{table()} WHERE key = $1", [key]) do
+    case Postgrex.query(@db_pid, "DELETE FROM #{@db_table} WHERE key = $1", [key]) do
       {:ok, %Postgrex.Result{num_rows: num_rows}} ->
+        clear_cache(key)
         {:ok, num_rows}
 
       result ->
@@ -76,15 +83,8 @@ defmodule Mcex.Adapter.KvPostgresCache do
     end
   end
 
-  def get_cache do
-    {:ok,
-      Map.keys(cache())
-      |> Enum.join("\n")
-    }
-  end
-
   defp tupleize_regex_query(key_or_value, vars) do
-    case Postgrex.query(@db, "SELECT * FROM #{table()} WHERE #{key_or_value} ~ $1", vars) do
+    case Postgrex.query(@db_pid, "SELECT * FROM #{@db_table} WHERE #{key_or_value} ~ $1", vars) do
       {:ok, %Postgrex.Result{num_rows: row_count, rows: rows_list}} when row_count > 0 ->
         tupleize_rows_list(rows_list)
 
@@ -102,7 +102,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   end
 
   defp db_get(key) do
-    case Postgrex.query(@db, "SELECT * FROM #{table()} WHERE key = $1", [key]) do
+    case Postgrex.query(@db_pid, "SELECT * FROM #{@db_table} WHERE key = $1", [key]) do
       {:ok, %Postgrex.Result{num_rows: 1, rows: [[_key, value]]}} ->
         {:ok, value}
 
@@ -122,14 +122,5 @@ defmodule Mcex.Adapter.KvPostgresCache do
       error ->
         {:error, inspect(error)}
     end
-  end
-
-  defp me, do: Agent.get(@me, &(&1))
-  defp table, do: me().table
-  defp cache, do: me().cache
-
-  defp update_cache(%{cache: cache} = state, key, new_value) do
-    {_, new_cache} = Map.get_and_update(cache, key, fn current_value -> {current_value, new_value} end)
-    Map.put(state, :cache, new_cache)
   end
 end
