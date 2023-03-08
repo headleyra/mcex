@@ -76,7 +76,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
     case Postgrex.query(@db_pid, "DELETE FROM #{@db_table} WHERE key = $1", [key]) do
       {:ok, %Postgrex.Result{num_rows: num_rows}} ->
         clear_cache(key)
-        {:ok, num_rows}
+        {:ok, inspect(num_rows)}
 
       result ->
         tupleize_result(result)
