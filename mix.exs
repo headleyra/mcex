@@ -4,7 +4,7 @@ defmodule Mcex.MixProject do
   def project do
     [
       app: :mcex,
-      version: "0.35.1",
+      version: "0.36.0",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -32,7 +32,7 @@ defmodule Mcex.MixProject do
 
       # Redis
       {:redix, "~> 1.1"},
-      {:castore, "~> 0.1"}
+      {:castore, "~> 1.0"}
     ]
   end
 end
