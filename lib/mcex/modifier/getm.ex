@@ -15,7 +15,7 @@ defmodule Mcex.Modifier.Getm do
           buffer
           |> String.split()
           |> Enum.map(fn key -> {key, Mc.modify("", "get #{key}")} end)
-          |> Enum.map(fn {key, {:ok, value}} -> "#{key}\n#{value}" end)
+          |> Enum.map(&key_valueize/1)
           |> Enum.join(decoded_separator)
         }
 
@@ -23,4 +23,7 @@ defmodule Mcex.Modifier.Getm do
         oops(:modify, "bad URI separator")
     end
   end
+
+  def key_valueize({key, {:ok, value}}), do: "#{key}\n#{value}"
+  def key_valueize({key, {:error, "not found"}}), do: "#{key}\n"
 end
