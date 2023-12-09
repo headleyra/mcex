@@ -4,7 +4,7 @@ defmodule Mcex.Modifier.Urljson do
   @get_options [recv_timeout: 10_000]
   @post_options [ssl: [{:versions, [:"tlsv1.2"]}], recv_timeout: 10_000]
 
-  def modify(buffer, _args) do
+  def modify(buffer, _args, _mappings) do
     case Jason.decode(buffer) do
       {:ok, map} ->
         case method_from(map) do

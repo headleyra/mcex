@@ -1,20 +1,20 @@
 defmodule Mcex.Modifier.Setm do
   use Mc.Railway, [:modify]
 
-  def modify(buffer, args) do
-    set_multiple(buffer, args)
+  def modify(buffer, args, mappings) do
+    set_multiple(buffer, args, mappings)
   end
 
-  defp set_multiple(buffer, ""), do: update(buffer, "\n---\n")
-  defp set_multiple(buffer, separator), do: update(buffer, separator)
+  defp set_multiple(buffer, "", mappings), do: update(buffer, "\n---\n", mappings)
+  defp set_multiple(buffer, separator, mappings), do: update(buffer, separator, mappings)
 
-  defp update(buffer, separator) do
+  defp update(buffer, separator, mappings) do
     case Mc.Uri.decode(separator) do
       {:ok, decoded_separator} ->
         String.split(buffer, decoded_separator)
         |> parse()
         |> validate()
-        |> set(buffer)
+        |> set(buffer, mappings)
 
       _error ->
         oops(:modify, "bad URI separator")
@@ -30,9 +30,9 @@ defmodule Mcex.Modifier.Setm do
     if Enum.all?(kv_tuple_list), do: kv_tuple_list, else: false
   end
 
-  defp set(kv_tuple_list, buffer) do
+  defp set(kv_tuple_list, buffer, mappings) do
     if kv_tuple_list do
-      Enum.each(kv_tuple_list, fn {key, value} -> Mc.modify(value, "set #{key}") end)
+      Enum.each(kv_tuple_list, fn {key, value} -> Mc.modify(value, "set #{key}", mappings) end)
       {:ok, buffer}
     else
       oops(:modify, "mismatched key/value pairs")

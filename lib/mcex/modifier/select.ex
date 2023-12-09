@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.Select do
   use Mc.Railway, [:modify]
 
-  def modify(buffer, args) do
+  def modify(buffer, args, _mappings) do
     buffer_lines = String.split(buffer, "\n")
     line_specs = line_specs_from(args)
 

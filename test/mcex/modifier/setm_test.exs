@@ -1,49 +1,54 @@
 defmodule Mcex.Modifier.SetmTest do
   use ExUnit.Case, async: false
   alias Mc.Adapter.KvMemory
-  alias Mc.Modifier.Get
   alias Mcex.Modifier.Getm
   alias Mcex.Modifier.Setm
 
+  defmodule Mappings do
+    defstruct [
+      get: {Mc.Modifier.Get, :modify},
+      set: {Mc.Modifier.Set, :modify}
+    ]
+  end
+
   setup do
     start_supervised({KvMemory, map: %{}})
-    start_supervised({Mc, mappings: %Mc.Mappings{}})
     :ok
   end
 
-  describe "modify/2" do
+  describe "modify/3" do
     test "parses the `buffer` as 'setm' format and sets keys/values as appropriate" do
-      Setm.modify("key\nvalue", "")
-      assert Get.modify("", "key") == {:ok, "value"}
+      Setm.modify("key\nvalue", "", %Mappings{})
+      assert Mc.Modifier.Get.modify("", "key", %Mappings{}) == {:ok, "value"}
 
-      Setm.modify("a\napple\tcore\n---\nt\ntennis\nball", "")
-      assert Get.modify("", "a") == {:ok, "apple\tcore"}
-      assert Get.modify("", "t") == {:ok, "tennis\nball"}
+      Setm.modify("a\napple\tcore\n---\nt\ntennis\nball", "", %Mappings{})
+      assert Mc.Modifier.Get.modify("", "a", %Mappings{}) == {:ok, "apple\tcore"}
+      assert Mc.Modifier.Get.modify("", "t", %Mappings{}) == {:ok, "tennis\nball"}
     end
 
     test "accepts a URI-encoded separator" do
-      Setm.modify("five\ndata 5 -\t@ seven\nvalue 7", " -%09@ ")
-      assert Get.modify("", "five") == {:ok, "data 5"}
-      assert Get.modify("", "seven") == {:ok, "value 7"}
+      Setm.modify("five\ndata 5 -\t@ seven\nvalue 7", " -%09@ ", %Mappings{})
+      assert Mc.Modifier.Get.modify("", "five", %Mappings{}) == {:ok, "data 5"}
+      assert Mc.Modifier.Get.modify("", "seven", %Mappings{}) == {:ok, "value 7"}
     end
 
     test "complements the 'getm' modifier" do
       setm_string1 = "key1\ndata one\n---\nkey2\nvalue two"
-      Setm.modify(setm_string1, "")
-      assert Getm.modify("key1 key2", "") == {:ok, setm_string1}
+      Setm.modify(setm_string1, "", %Mappings{})
+      assert Getm.modify("key1 key2", "", %Mappings{}) == {:ok, setm_string1}
 
       setm_string2 = "key1\ndata one:::key2\nvalue two"
-      Setm.modify(setm_string2, ":::")
-      assert Getm.modify("key1 key2", ":::") == {:ok, setm_string2}
+      Setm.modify(setm_string2, ":::", %Mappings{})
+      assert Getm.modify("key1 key2", ":::", %Mappings{}) == {:ok, setm_string2}
     end
 
     test "works with ok tuples" do
-      Setm.modify({:ok, "cash\ndosh"}, "")
-      assert Get.modify("", "cash") == {:ok, "dosh"}
+      Setm.modify({:ok, "cash\ndosh"}, "", %Mappings{})
+      assert Mc.Modifier.Get.modify("", "cash", %Mappings{}) == {:ok, "dosh"}
     end
 
     test "allows error tuples to pass through" do
-      assert Setm.modify({:error, "reason"}, "") == {:error, "reason"}
+      assert Setm.modify({:error, "reason"}, "", %Mappings{}) == {:error, "reason"}
     end
   end
 end

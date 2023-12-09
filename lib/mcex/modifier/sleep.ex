@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.Sleep do
   use Mc.Railway, [:modify]
 
-  def modify(buffer, args) do
+  def modify(buffer, args, _mappings) do
     case Mc.String.to_int(args) do
       {:ok, seconds} when seconds > 0 ->
         Process.sleep(seconds * 1_000)
