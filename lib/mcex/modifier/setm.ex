@@ -1,5 +1,5 @@
 defmodule Mcex.Modifier.Setm do
-  use Mc.Railway, [:modify]
+  use Mc.Modifier
 
   def modify(buffer, args, mappings) do
     set_multiple(buffer, args, mappings)
@@ -17,7 +17,7 @@ defmodule Mcex.Modifier.Setm do
         |> set(buffer, mappings)
 
       _error ->
-        oops(:modify, "bad URI separator")
+        oops("bad URI separator")
     end
   end
 
@@ -35,7 +35,7 @@ defmodule Mcex.Modifier.Setm do
       Enum.each(kv_tuple_list, fn {key, value} -> Mc.modify(value, "set #{key}", mappings) end)
       {:ok, buffer}
     else
-      oops(:modify, "mismatched key/value pairs")
+      oops("mismatched key/value pairs")
     end
   end
 

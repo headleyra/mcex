@@ -1,5 +1,5 @@
 defmodule Mcex.Modifier.Sleep do
-  use Mc.Railway, [:modify]
+  use Mc.Modifier
 
   def modify(buffer, args, _mappings) do
     case Mc.String.to_int(args) do
@@ -8,7 +8,7 @@ defmodule Mcex.Modifier.Sleep do
         {:ok, buffer}
 
       _bad_seconds ->
-        oops(:modify, "bad positive integer")
+        oops("bad positive integer")
     end
   end
 end

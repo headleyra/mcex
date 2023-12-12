@@ -4,11 +4,11 @@ defmodule Mcex.Modifier.InlineTest do
 
   defmodule Mappings do
     defstruct [
-      buffer: {Mc.Modifier.Buffer, :modify},
-      error: {Mc.Modifier.Error, :modify},
-      lcase: {Mc.Modifier.Lcase, :modify},
-      range: {Mc.Modifier.Range, :modify},
-      replace: {Mc.Modifier.Replace, :modify}
+      buffer: Mc.Modifier.Buffer,
+      error: Mc.Modifier.Error,
+      lcase: Mc.Modifier.Lcase,
+      range: Mc.Modifier.Range,
+      replace: Mc.Modifier.Replace
     ]
   end
 

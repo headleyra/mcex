@@ -1,5 +1,5 @@
 defmodule Mcex.Modifier.Getm do
-  use Mc.Railway, [:modify]
+  use Mc.Modifier
 
   def modify(buffer, args, mappings) do
     get_multiple(buffer, args, mappings)
@@ -20,7 +20,7 @@ defmodule Mcex.Modifier.Getm do
         }
 
       _error ->
-        oops(:modify, "bad URI separator")
+        oops("bad URI separator")
     end
   end
 

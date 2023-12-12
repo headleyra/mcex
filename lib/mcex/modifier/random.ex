@@ -1,5 +1,5 @@
 defmodule Mcex.Modifier.Random do
-  use Mc.Railway, [:modify]
+  use Mc.Modifier
 
   def modify(_buffer, args, _mappings) do
     case Mc.String.to_int(args) do
@@ -7,7 +7,7 @@ defmodule Mcex.Modifier.Random do
         {:ok, "#{:rand.uniform(integer)}"}
 
       _bad_args ->
-        oops(:modify, "bad random limit")
+        oops("bad random limit")
     end
   end
 end

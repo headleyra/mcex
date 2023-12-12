@@ -6,8 +6,8 @@ defmodule Mcex.Modifier.SetmTest do
 
   defmodule Mappings do
     defstruct [
-      get: {Mc.Modifier.Get, :modify},
-      set: {Mc.Modifier.Set, :modify}
+      get: Mc.Modifier.Get,
+      set: Mc.Modifier.Set
     ]
   end
 

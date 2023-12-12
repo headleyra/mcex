@@ -1,5 +1,5 @@
 defmodule Mcex.Modifier.Inline do
-  use Mc.Railway, [:modify]
+  use Mc.Modifier
 
   def modify(buffer, _args, mappings) do
     Mc.Modifier.Buffer.modify("", buffer, mappings)

@@ -1,12 +1,12 @@
 defmodule Mcex.Modifier.Select do
-  use Mc.Railway, [:modify]
+  use Mc.Modifier
 
   def modify(buffer, args, _mappings) do
     buffer_lines = String.split(buffer, "\n")
     line_specs = line_specs_from(args)
 
     if Enum.any?(line_specs, fn line_spec -> line_spec == :error end) do
-      oops(:modify, "bad line spec(s)")
+      oops("bad line spec(s)")
     else
       {:ok,
         line_specs

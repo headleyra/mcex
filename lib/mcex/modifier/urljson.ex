@@ -1,5 +1,5 @@
 defmodule Mcex.Modifier.Urljson do
-  use Mc.Railway, [:modify]
+  use Mc.Modifier
   @user_agent "Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0"
   @get_options [recv_timeout: 10_000]
   @post_options [ssl: [{:versions, [:"tlsv1.2"]}], recv_timeout: 10_000]
@@ -19,11 +19,11 @@ defmodule Mcex.Modifier.Urljson do
             |> reply_for()
 
           _bad_method ->
-            oops(:modify, "bad method")
+            oops("bad method")
         end
 
       {:error, _reason} ->
-        oops(:modify, "bad JSON")
+        oops("bad JSON")
     end
   end
 
@@ -58,13 +58,13 @@ defmodule Mcex.Modifier.Urljson do
         {:ok, body}
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
-        oops(:reply_for, "404 (not found)")
+        oops("404 (not found)")
 
       {:ok, %HTTPoison.Response{body: body}} ->
-        oops(:reply_for, body)
+        oops(body)
 
       {:error, %HTTPoison.Error{reason: reason}} ->
-        oops(:reply_for, inspect(reason))
+        oops(inspect(reason))
     end
   end
 end
