@@ -1,16 +1,16 @@
 defmodule Mcex.Mappings do
   defstruct [
-    base64: {Mcex.Modifier.Base64, :modify},
-    date: {Mcex.Modifier.Date, :modify},
-    getm: {Mcex.Modifier.Getm, :modify},
-    inline: {Mcex.Modifier.Inline, :modify},
-    rand: {Mcex.Modifier.Random, :modify},
-    select: {Mcex.Modifier.Select, :modify},
-    setm: {Mcex.Modifier.Setm, :modify},
-    sleep: {Mcex.Modifier.Sleep, :modify},
-    time: {Mcex.Modifier.Time, :modify},
-    trap: {Mcex.Modifier.Trap, :modify},
-    urljson: {Mcex.Modifier.Urljson, :modify},
-    uuid: {Mcex.Modifier.Uuid, :modify}
+    base64: Mcex.Modifier.Base64,
+    date: Mcex.Modifier.Date,
+    getm: Mcex.Modifier.Getm,
+    inline: Mcex.Modifier.Inline,
+    rand: Mcex.Modifier.Random,
+    select: Mcex.Modifier.Select,
+    setm: Mcex.Modifier.Setm,
+    sleep: Mcex.Modifier.Sleep,
+    time: Mcex.Modifier.Time,
+    trap: Mcex.Modifier.Trap,
+    urljson: Mcex.Modifier.Urljson,
+    uuid: Mcex.Modifier.Uuid
   ]
 end
