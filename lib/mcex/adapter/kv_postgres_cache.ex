@@ -114,7 +114,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   defp tupleize_result(result) do
     case result do
       {:ok, %Postgrex.Result{num_rows: 0}} ->
-        {:error, "not found"}
+        {:error, :not_found}
 
       {:error, %Postgrex.Error{postgres: %{message: reason}}} ->
         {:error, reason}
