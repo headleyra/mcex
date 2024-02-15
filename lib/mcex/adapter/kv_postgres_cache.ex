@@ -60,6 +60,18 @@ defmodule Mcex.Adapter.KvPostgresCache do
     tupleize_regex_query("value", [regex_str])
   end
 
+  @impl true
+  def delete(key) do
+    case Postgrex.query(@db_pid, "DELETE FROM #{@db_table} WHERE key = $1", [key]) do
+      {:ok, %Postgrex.Result{num_rows: num_rows}} ->
+        clear_cache(key)
+        {:ok, inspect(num_rows)}
+
+      result ->
+        tupleize_result(result)
+    end
+  end
+
   def cache, do: Agent.get(@cache_pid, &(&1))
 
   def clear_cache(key) do
@@ -70,17 +82,6 @@ defmodule Mcex.Adapter.KvPostgresCache do
     Logger.info("======= create table")
     result = Postgrex.query!(@db_pid, "CREATE TABLE #{@db_table} (key VARCHAR(32) PRIMARY KEY, value TEXT)", [])
     Logger.info(result)
-  end
-
-  def delete(key) do
-    case Postgrex.query(@db_pid, "DELETE FROM #{@db_table} WHERE key = $1", [key]) do
-      {:ok, %Postgrex.Result{num_rows: num_rows}} ->
-        clear_cache(key)
-        {:ok, inspect(num_rows)}
-
-      result ->
-        tupleize_result(result)
-    end
   end
 
   defp tupleize_regex_query(key_or_value, vars) do

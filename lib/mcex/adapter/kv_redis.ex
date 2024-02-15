@@ -51,6 +51,11 @@ defmodule Mcex.Adapter.KvRedis do
     end
   end
 
+  @impl true
+  def delete(_key) do
+    {:error, "not yet implemeted"}
+  end
+
   defp keys(pattern) do
     {:ok, list} = Redix.command(__MODULE__, ["KEYS", pattern])
     list
