@@ -4,7 +4,7 @@ defmodule Mcex.MixProject do
   def project do
     [
       app: :mcex,
-      version: "0.57.0",
+      version: "0.57.1",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps()
