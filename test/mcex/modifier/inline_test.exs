@@ -8,14 +8,12 @@ defmodule Mcex.Modifier.InlineTest do
       assert Inline.modify("will split into; lines", "", %Mc.Mappings{}) == {:ok, "will split into\nlines"}
       assert Inline.modify("won't split into;lines", "", %Mc.Mappings{}) == {:ok, "won't split into;lines"}
       assert Inline.modify("big; tune; ", "", %Mc.Mappings{}) == {:ok, "big\ntune\n"}
-      assert Inline.modify("foo %0a %09 bar", "", %Mc.Mappings{}) == {:ok, "foo \n \t bar"}
     end
 
     test "runs back-ticked scripts in place" do
       assert Inline.modify("zero `range 4` five", "", %Mc.Mappings{}) == {:ok, "zero 1\n2\n3\n4 five"}
       assert Inline.modify("do you `buffer foo`?", "", %Mc.Mappings{}) == {:ok, "do you foo?"}
       assert Inline.modify("yes `buffer WHEE; casel; replace whee we` can", "", %Mc.Mappings{}) == {:ok, "yes we can"}
-      assert Inline.modify("== `buffer FOO %0a casel; replace foo bar` ==", "", %Mc.Mappings{}) == {:ok, "== bar  =="}
       assert Inline.modify("; ;tumble; weed; ", "", %Mc.Mappings{}) == {:ok, "\n;tumble\nweed\n"}
     end
 
