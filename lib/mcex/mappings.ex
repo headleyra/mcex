@@ -4,6 +4,7 @@ defmodule Mcex.Mappings do
     base64: Mcex.Modifier.Base64,
     bufferv: Mcex.Modifier.BufferV,
     date: Mcex.Modifier.Date,
+    debug: Mcex.Modifier.Debug,
     exec: Mcex.Modifier.Exec,
     findx: Mcex.Modifier.FindX,
     if: Mcex.Modifier.If,

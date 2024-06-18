@@ -1,5 +1,6 @@
-defmodule Go.Modifier.Debug do
+defmodule Mcex.Modifier.Debug do
   use Mc.Modifier
+  require Logger
 
   def modify(buffer, args, _mappings) do
     case String.split(args, " ", parts: 2) do
@@ -17,7 +18,7 @@ defmodule Go.Modifier.Debug do
   end
 
   defp outp(title, string) do
-    IO.puts("\n#{title}")
-    IO.puts(string)
+    Logger.info("\n#{title}")
+    Logger.info(string)
   end
 end
