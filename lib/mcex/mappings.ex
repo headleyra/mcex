@@ -1,14 +1,33 @@
 defmodule Mcex.Mappings do
   defstruct [
+    args: Mcex.Modifier.Args,
     base64: Mcex.Modifier.Base64,
+    bufferv: Mcex.Modifier.BufferV,
     date: Mcex.Modifier.Date,
+    exec: Mcex.Modifier.Exec,
+    findx: Mcex.Modifier.FindX,
+    if: Mcex.Modifier.If,
     inline: Mcex.Modifier.Inline,
+    max: Mcex.Modifier.Max,
+    min: Mcex.Modifier.Min,
+    mods: Mcex.Modifier.Mods,
+    padl: Mcex.Modifier.PadL,
     rand: Mcex.Modifier.Random,
+    rest: Mcex.Modifier.Rest,
     select: Mcex.Modifier.Select,
     sleep: Mcex.Modifier.Sleep,
+    splitc: Mcex.Modifier.SplitC,
+    tee: Mcex.Modifier.Tee,
     time: Mcex.Modifier.Time,
     trap: Mcex.Modifier.Trap,
+    trunc: Mcex.Modifier.Truncate,
+    urid: Mcex.Modifier.UriD,
+    urie: Mcex.Modifier.UriE,
     urljson: Mcex.Modifier.Urljson,
-    uuid: Mcex.Modifier.Uuid
+    uuid: Mcex.Modifier.Uuid,
+    wrap: Mcex.Modifier.Wrap,
+
+    # Aliases
+    bv: Mcex.Modifier.BufferV
   ]
 end
