@@ -19,6 +19,7 @@ defmodule Mcex.Mappings do
     splitc: Mcex.Modifier.SplitC,
     tee: Mcex.Modifier.Tee,
     time: Mcex.Modifier.Time,
+    timeu: Mcex.Modifier.TimeU,
     trap: Mcex.Modifier.Trap,
     trunc: Mcex.Modifier.Truncate,
     urid: Mcex.Modifier.UriD,
