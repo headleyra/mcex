@@ -18,7 +18,6 @@ defmodule Mcex.Modifier.Debug do
   end
 
   defp outp(title, string) do
-    Logger.info("\n#{title}")
-    Logger.info(string)
+    Logger.info("\n#{title}\n#{string}")
   end
 end
