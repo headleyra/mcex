@@ -1,6 +1,6 @@
 defmodule Mcex.Tokenizer do
-  @open_brace "{"
-  @close_brace "}"
+  @open_char "{"
+  @close_char "}"
 
   def count(list) do
     list
@@ -13,47 +13,41 @@ defmodule Mcex.Tokenizer do
   def parse(string) do
     string
     |> String.graphemes()
-    |> Enum.chunk_while([], chunk_func(@open_brace, @close_brace), after_func())
+    |> Enum.reduce([], fn char, acc -> tokenize(char, acc)  end)
+    |> Enum.reverse()
     |> validate()
   end
 
-  defp chunk_func(open_brace, close_brace) do
-    fn char, acc ->
-      case {char, acc} do
-        {^open_brace, _acc} ->
-          {:cont, {:open, []}}
+  defp tokenize(char, acc) do
+    case {char, acc} do
+      {@open_char, acc} ->
+        [{:open, []} | acc]
 
-        {^close_brace, {:open, chars}} ->
-          ordered_chars = Enum.reverse(chars)
-          {:cont, {:ok, ordered_chars}}
+      {@close_char, [{:open, chars} | rest]} ->
+        ordered_chars = Enum.reverse(chars)
+        [{:ok, ordered_chars} | rest]
 
-        {^close_brace, _acc} ->
-          {:cont, [], {:open, :mismatch}}
+      {_char, [{:open, chars} | rest]} ->
+        new_chars = [char | chars]
+        [{:open, new_chars} | rest]
 
-        {_char, {:open, chars}} ->
-          new_chars = [char | chars]
-          {:cont, {:open, new_chars}}
-
-        {char, acc} ->
-          {:cont, char, acc}
-      end
+      {_char, _acc} ->
+        [char | acc]
     end
   end
-
-  defp after_func do
-    fn acc ->
-      {:cont, acc, []}
-    end
-  end
-
+  
   defp validate(acc) do
-    bad = Enum.any?(acc, fn char -> match?({:open, _}, char) end)
+    # an unclosed open character can't be detected until the end of processing, we don't mind this, but it
+    # needs to be swapped out for a 'proper' one
+    
+    Enum.map(acc, fn
+      {:open, chars} ->
+        ordered_chars = Enum.reverse(chars)
+        [@open_char | ordered_chars]
 
-    if bad do
-      {:error, :mismatch}
-    else
-      acc
-      |> Enum.reject(fn char -> char == [] end)
-    end
+      char ->
+        char
+    end)
+    |> List.flatten()
   end
 end
