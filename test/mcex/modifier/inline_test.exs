@@ -11,20 +11,20 @@ defmodule Mcex.Modifier.InlineTest do
     end
 
     test "runs back-ticked scripts in place" do
-      assert Inline.modify("zero `range 4` five", "", %Mc.Mappings{}) == {:ok, "zero 1\n2\n3\n4 five"}
-      assert Inline.modify("do you `buffer foo`?", "", %Mc.Mappings{}) == {:ok, "do you foo?"}
-      assert Inline.modify("yes `buffer WHEE; casel; replace whee we` can", "", %Mc.Mappings{}) == {:ok, "yes we can"}
+      assert Inline.modify("zero {range 4} five", "", %Mc.Mappings{}) == {:ok, "zero 1\n2\n3\n4 five"}
+      assert Inline.modify("do you {buffer foo}?", "", %Mc.Mappings{}) == {:ok, "do you foo?"}
+      assert Inline.modify("yes {buffer WHEE; casel; replace whee we} can", "", %Mc.Mappings{}) == {:ok, "yes we can"}
       assert Inline.modify("; ;tumble; weed; ", "", %Mc.Mappings{}) == {:ok, "\n;tumble\nweed\n"}
     end
 
     test "expands multiple 'inline strings'" do
-      assert Inline.modify("14da `buffer TREBLE; casel` 24da `buffer x; replace x bass`", "", %Mc.Mappings{}) ==
+      assert Inline.modify("14da {buffer TREBLE; casel} 24da {buffer x; replace x bass}", "", %Mc.Mappings{}) ==
         {:ok, "14da treble 24da bass"}
     end
 
     test "handles 'inline strings' that return errors" do
-      assert Inline.modify("`error oops`", "", %Mc.Mappings{}) == {:error, "oops"}
-      assert Inline.modify("`error first` `error second`", "", %Mc.Mappings{}) == {:error, "first"}
+      assert Inline.modify("{error oops}", "", %Mc.Mappings{}) == {:error, "oops"}
+      assert Inline.modify("{error first} `error second`", "", %Mc.Mappings{}) == {:error, "first"}
     end
 
     test "works with ok tuples" do
