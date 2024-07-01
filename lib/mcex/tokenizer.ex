@@ -25,7 +25,7 @@ defmodule Mcex.Tokenizer do
 
       {@close_char, [{:open, chars} | rest]} ->
         ordered_chars = Enum.reverse(chars)
-        [{:ok, ordered_chars} | rest]
+        [{:token, ordered_chars} | rest]
 
       {_char, [{:open, chars} | rest]} ->
         new_chars = [char | chars]
