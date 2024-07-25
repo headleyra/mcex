@@ -15,6 +15,7 @@ defmodule Mcex.Mappings do
     padl: Mcex.Modifier.PadL,
     rand: Mcex.Modifier.Random,
     rest: Mcex.Modifier.Rest,
+    round: Mcex.Modifier.Round,
     select: Mcex.Modifier.Select,
     sleep: Mcex.Modifier.Sleep,
     splitc: Mcex.Modifier.SplitC,
