@@ -4,7 +4,7 @@ defmodule Mcex.MixProject do
   def project do
     [
       app: :mcex,
-      version: "0.71.0",
+      version: "0.71.1",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -22,7 +22,6 @@ defmodule Mcex.MixProject do
   defp deps do
     [
       {:elixir_uuid, "~> 1.2"},
-      {:tesla, "~> 1.3"},
 
       # Mc
       {:mc, git: "https://github.com/headleyra/mc.git"},
