@@ -7,6 +7,7 @@ defmodule Mcex.Mappings do
     debug: Mcex.Modifier.Debug,
     exec: Mcex.Modifier.Exec,
     findx: Mcex.Modifier.FindX,
+    have: Mcex.Modifier.Have,
     if: Mcex.Modifier.If,
     inline: Mcex.Modifier.Inline,
     max: Mcex.Modifier.Max,
