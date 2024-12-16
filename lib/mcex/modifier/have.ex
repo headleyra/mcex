@@ -24,7 +24,7 @@ defmodule Mcex.Modifier.Have do
     date
     """
 
-    Mc.modify("", script, mappings)
+    Mc.m(script, mappings)
   end
 
   defp show(key, mappings) do
@@ -33,7 +33,7 @@ defmodule Mcex.Modifier.Have do
     trap
     """
 
-    {:ok, date_str} = Mc.modify("", script, mappings)
+    {:ok, date_str} = Mc.m(script, mappings)
     dates = Mcex.Have.dates(date_str)
     summary = Mcex.Have.summary(dates, Date.utc_today())
 

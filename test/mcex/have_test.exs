@@ -65,6 +65,18 @@ defmodule Mcex.HaveTest do
         average: 1.5
       }
 
+      d1 = Date.new!(2011, 1, 2)
+      d2 = Date.new!(2011, 1, 1)
+      d3 = Date.new!(2011, 1, 5)
+      today = Date.new!(2011, 1, 7)
+
+      assert Have.summary([d1, d2, d3], today) == %{
+        first: Date.new!(2011, 1, 1),
+        total: 7,
+        have: 3,
+        average: 1.33
+      }
+
       d1 = Date.new!(2011, 1, 9)
       d2 = Date.new!(2011, 1, 7)
       d3 = Date.new!(2011, 1, 1)

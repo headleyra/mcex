@@ -14,7 +14,7 @@ defmodule Mcex.Have do
       total_have_days = Enum.count(have_dates),
       intervals when intervals != 0 <- Enum.count(dates) - 1,
       average_interval_precise = (total_days - total_have_days) / intervals,
-      average_interval = Float.round(average_interval_precise, 1)
+      average_interval = Float.round(average_interval_precise, 2)
     do
       %{
         first: first_date,
