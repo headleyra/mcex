@@ -9,35 +9,35 @@ defmodule Mcex.HaveTest do
 
     test "works with no have dates" do
       assert Have.summary([], Date.new!(2015, 1, 8)) == %{
-        first: "n/a",
-        total: 0,
-        have: 0,
-        average: "infinity"
+        one: "n/a",
+        tot: 0,
+        hav: 0,
+        avg: "infinity"
       }
     end
 
     test "works with 1 have date" do
       assert Have.summary([Date.new!(2016, 1, 2)], Date.new!(2016, 1, 3)) == %{
-        first: Date.new!(2016, 1, 2),
-        total: 2,
-        have: 1,
-        average: 1
+        one: Date.new!(2016, 1, 2),
+        tot: 2,
+        hav: 1,
+        avg: 1
       }
 
       assert Have.summary([Date.new!(2017, 5, 11)], Date.new!(2017, 5, 15)) == %{
-        first: Date.new!(2017, 5, 11),
-        total: 5,
-        have: 1,
-        average: 4
+        one: Date.new!(2017, 5, 11),
+        tot: 5,
+        hav: 1,
+        avg: 4
       }
     end
 
     test "works with 1 have date (where <today> = <the have date>" do
       assert Have.summary([Date.new!(2016, 1, 2)], Date.new!(2016, 1, 2)) == %{
-        first: Date.new!(2016, 1, 2),
-        total: 1,
-        have: 1,
-        average: "n/a"
+        one: Date.new!(2016, 1, 2),
+        tot: 1,
+        hav: 1,
+        avg: "n/a"
       }
     end
 
@@ -46,10 +46,10 @@ defmodule Mcex.HaveTest do
       d2 = Date.new!(2011, 1, 2)
 
       assert Have.summary([d1, d2], d2) == %{
-        first: Date.new!(2011, 1, 1),
-        total: 2,
-        have: 2,
-        average: 0
+        one: Date.new!(2011, 1, 1),
+        tot: 2,
+        hav: 2,
+        avg: 0
       }
     end
 
@@ -59,10 +59,10 @@ defmodule Mcex.HaveTest do
       today = Date.new!(2011, 1, 5)
 
       assert Have.summary([d1, d2], today) == %{
-        first: Date.new!(2011, 1, 1),
-        total: 5,
-        have: 2,
-        average: 1.5
+        one: Date.new!(2011, 1, 1),
+        tot: 5,
+        hav: 2,
+        avg: 1.5
       }
 
       d1 = Date.new!(2011, 1, 2)
@@ -71,10 +71,10 @@ defmodule Mcex.HaveTest do
       today = Date.new!(2011, 1, 7)
 
       assert Have.summary([d1, d2, d3], today) == %{
-        first: Date.new!(2011, 1, 1),
-        total: 7,
-        have: 3,
-        average: 1.33
+        one: Date.new!(2011, 1, 1),
+        tot: 7,
+        hav: 3,
+        avg: 1.33
       }
 
       d1 = Date.new!(2011, 1, 9)
@@ -83,10 +83,10 @@ defmodule Mcex.HaveTest do
       today = Date.new!(2011, 1, 12)
 
       assert Have.summary([d1, d2, d3], today) == %{
-        first: Date.new!(2011, 1, 1),
-        total: 12,
-        have: 3,
-        average: 3.0
+        one: Date.new!(2011, 1, 1),
+        tot: 12,
+        hav: 3,
+        avg: 3.0
       }
     end
   end

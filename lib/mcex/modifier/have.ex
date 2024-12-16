@@ -39,10 +39,10 @@ defmodule Mcex.Modifier.Have do
 
     {:ok,
       """
-      1st have: #{summary.first}
-      have days: #{summary.have}
-      total days: #{summary.total}
-      average interval: #{summary.average}
+      one: #{summary.one}
+      hav: #{summary.hav}
+      tot: #{summary.tot}
+      avg: #{summary.avg}
       """
     }
   end

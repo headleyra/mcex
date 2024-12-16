@@ -1,8 +1,8 @@
 defmodule Mcex.Have do
-  def summary([], _todays_date), do: %{first: "n/a", total: 0, have: 0, average: "infinity"}
+  def summary([], _todays_date), do: %{one: "n/a", tot: 0, hav: 0, avg: "infinity"}
 
   def summary([date], todays_date) when date == todays_date do
-    %{first: date, total: 1, have: 1, average: "n/a"}
+    %{one: date, tot: 1, hav: 1, avg: "n/a"}
   end
 
   def summary(have_dates, todays_date) do
@@ -17,18 +17,18 @@ defmodule Mcex.Have do
       average_interval = Float.round(average_interval_precise, 2)
     do
       %{
-        first: first_date,
-        total: total_days,
-        have: total_have_days,
-        average: average_interval
+        one: first_date,
+        tot: total_days,
+        hav: total_have_days,
+        avg: average_interval
       }
     else
       _error ->
         %{
-          first: "undefined",
-          total: "undefined",
-          have: "undefined",
-          average: "undefined"
+          one: "undefined",
+          tot: "undefined",
+          hav: "undefined",
+          avg: "undefined"
         }
     end
   end
