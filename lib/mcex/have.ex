@@ -1,25 +1,47 @@
 defmodule Mcex.Have do
-  def summary([], _todays_date), do: %{one: "n/a", tot: 0, hav: 0, avg: "infinity"}
+  def stats(date_str, today) do
+    cond do
+      blank?(date_str) ->
+        %{one: "n/a", tot: 0, hav: 0, avg: "infinity"}
 
-  def summary([date], todays_date) when date == todays_date do
+      true ->
+        calc_or_error(date_str, today)
+    end
+  end
+
+  defp blank?(str) do
+    String.match?(str, ~r/^\s*$/)
+  end
+
+  defp calc_or_error(date_str, today) do
+    case dates(date_str) do
+      {:error, _} ->
+        :error
+
+      valid_dates ->
+        calc(valid_dates, today)
+    end
+  end
+
+  defp calc([date], today) when date == today do
     %{one: date, tot: 1, hav: 1, avg: "n/a"}
   end
 
-  def summary(have_dates, todays_date) do
+  defp calc(have_dates, today) do
+    all_dates = concat(have_dates, today)
+    {first_day, last_day} = first_last_day(all_dates)
+    days_count = days_count(first_day, last_day)
+    have_days_count = have_days(have_dates)
+
     with \
-      dates = normalize(have_dates, todays_date),
-      first_date = List.first(dates),
-      last_date = Enum.at(dates, -1),
-      total_days = Date.diff(last_date, first_date) + 1,
-      total_have_days = Enum.count(have_dates),
-      intervals when intervals != 0 <- Enum.count(dates) - 1,
-      average_interval_precise = (total_days - total_have_days) / intervals,
+      intervals when intervals != 0 <- intervals(all_dates),
+      average_interval_precise = (days_count - have_days_count) / intervals,
       average_interval = Float.round(average_interval_precise, 2)
     do
       %{
-        one: first_date,
-        tot: total_days,
-        hav: total_have_days,
+        one: first_day,
+        tot: days_count,
+        hav: have_days_count,
         avg: average_interval
       }
     else
@@ -33,20 +55,61 @@ defmodule Mcex.Have do
     end
   end
 
-  def dates(date_str) do
+  defp dates(date_str) do
     date_str
     |> String.split()
-    |> Enum.map(fn e -> String.split(e, "-") end)
-    |> Enum.map(fn [y, m, d] -> to_date(y, m, d) end)
+    |> Enum.reduce_while([], fn str, acc -> to_date(str, acc) end)
+    |> sort_uniqueify()
   end
 
-  defp to_date(y, m, d) do
-    Date.new!(String.to_integer(y), String.to_integer(m), String.to_integer(d))
+  defp to_date(str, acc) do
+    import Mc.String, only: [to_int: 1]
+
+    with \
+      [yy, mm, dd] <- String.split(str, "-"),
+      {:ok, y} <- to_int(yy),
+      {:ok, m} <- to_int(mm),
+      {:ok, d} <- to_int(dd),
+      {:ok, date} <- Date.new(y, m, d)
+    do
+      {:cont, [date | acc]}
+    else
+      _foo ->
+        {:halt, {:error, :parse}}
+    end
   end
 
-  defp normalize(dates, today) do
+  defp sort_uniqueify(dates) do
+    case dates do
+      {:error, _} ->
+        dates
+
+      _ok ->
+        dates
+        |> Enum.sort(Date)
+        |> Enum.uniq()
+    end
+  end
+
+  defp have_days(dates) do
+    Enum.count(dates)
+  end
+
+  defp first_last_day(dates) do
+    first = List.first(dates)
+    last = Enum.at(dates, -1)
+    {first, last}
+  end
+
+  defp days_count(first_day, last_day) do
+    Date.diff(last_day, first_day) + 1
+  end
+
+  defp intervals(dates) do
+    Enum.count(dates) - 1
+  end
+
+  defp concat(dates, today) do
     dates ++ [today]
-    |> Enum.uniq()
-    |> Enum.sort(Date)
   end
 end

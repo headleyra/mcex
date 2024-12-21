@@ -4,7 +4,7 @@ defmodule Mcex.Modifier.Have do
   def modify(_buffer, args, mappings) do
     case String.split(args) do
       [key] ->
-        have(key, mappings)
+        add_date(key, mappings)
 
       [key, "show"] ->
         show(key, mappings)
@@ -14,7 +14,7 @@ defmodule Mcex.Modifier.Have do
     end
   end
 
-  defp have(key, mappings) do
+  defp add_date(key, mappings) do
     script = """
     get #{key}
     trap
@@ -34,16 +34,13 @@ defmodule Mcex.Modifier.Have do
     """
 
     {:ok, date_str} = Mc.m(script, mappings)
-    dates = Mcex.Have.dates(date_str)
-    summary = Mcex.Have.summary(dates, Date.utc_today())
 
-    {:ok,
-      """
-      one: #{summary.one}
-      hav: #{summary.hav}
-      tot: #{summary.tot}
-      avg: #{summary.avg}
-      """
-    }
+    case Mcex.Have.stats(date_str, Date.utc_today()) do
+      :error ->
+        oops("parse")
+
+      stats ->
+        {:ok, "one: #{stats.one}\nhav: #{stats.hav}\ntot: #{stats.tot}\navg: #{stats.avg}"}
+    end
   end
 end
