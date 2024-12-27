@@ -10,7 +10,7 @@ defmodule Mcex.Modifier.Have do
         show(key, mappings)
 
       _parse_error ->
-        oops("parse")
+        oops("parse error")
     end
   end
 
