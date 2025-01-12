@@ -40,7 +40,15 @@ defmodule Mcex.Modifier.Have do
         oops("parse")
 
       stats ->
-        {:ok, "one: #{stats.one}\nhav: #{stats.hav}\ntot: #{stats.tot}\navg: #{stats.avg}"}
+        result = """
+        one: #{stats.one}
+        hav: #{stats.hav}
+        tot: #{stats.tot}
+        avg: #{stats.avg}
+        cur: #{stats.cur}
+        """
+
+        {:ok, String.trim_trailing(result)}
     end
   end
 end

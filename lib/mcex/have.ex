@@ -2,7 +2,7 @@ defmodule Mcex.Have do
   def stats(date_str, today) do
     cond do
       blank?(date_str) ->
-        %{one: "n/a", tot: 0, hav: 0, avg: "infinity"}
+        %{one: "n/a", tot: 0, hav: 0, avg: "infinity", cur: "n/a"}
 
       true ->
         calc_or_error(date_str, today)
@@ -24,34 +24,37 @@ defmodule Mcex.Have do
   end
 
   defp calc([date], today) when date == today do
-    %{one: date, tot: 1, hav: 1, avg: "n/a"}
+    %{one: date, tot: 1, hav: 1, avg: "n/a", cur: 0}
   end
 
   defp calc(have_dates, today) do
     all_dates = concat(have_dates, today)
     {first_day, last_day} = first_last_day(all_dates)
+    {_, last_have_day} = first_last_day(have_dates)
     days_count = days_count(first_day, last_day)
     have_days_count = have_days(have_dates)
+    intervals = intervals(all_dates)
+    current_interval = current_interval(last_have_day, today)
 
-    with \
-      intervals when intervals != 0 <- intervals(all_dates),
-      average_interval_precise = (days_count - have_days_count) / intervals,
+    if intervals > 0 do
+      average_interval_precise = (days_count - have_days_count) / intervals
       average_interval = Float.round(average_interval_precise, 2)
-    do
+
       %{
         one: first_day,
         tot: days_count,
         hav: have_days_count,
-        avg: average_interval
+        avg: average_interval,
+        cur: current_interval
       }
     else
-      _error ->
-        %{
-          one: "undefined",
-          tot: "undefined",
-          hav: "undefined",
-          avg: "undefined"
-        }
+      %{
+        one: "undefined",
+        tot: "undefined",
+        hav: "undefined",
+        avg: "undefined",
+        cur: "undefined"
+      }
     end
   end
 
@@ -93,6 +96,10 @@ defmodule Mcex.Have do
 
   defp have_days(dates) do
     Enum.count(dates)
+  end
+
+  defp current_interval(last_have_day, today) do
+    Date.diff(today, last_have_day)
   end
 
   defp first_last_day(dates) do
