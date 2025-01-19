@@ -2,10 +2,25 @@ defmodule Mcex.Modifier.HaveTest do
   use ExUnit.Case, async: false
   alias Mcex.Modifier.Have
 
+  defp ago(days) do
+    Date.utc_today()
+    |> Date.add(-days)
+  end
+
+  defp day_1 do
+    ago(7)
+  end
+
+  defp day_2 do
+    ago(2)
+  end
+
   setup do
     start_supervised({Mc.Adapter.KvMemory, map: %{
+      "bob" => "2016-7-foo\n2017-01-02 2018-07-05",
       "tim" => "  ",
-      "jon" => "\n  \t"
+      "jon" => "\n  \t",
+      "dan" => "#{day_1()}\n#{day_2()}"
     }})
 
     mappings = %Mc.Mappings{} |> Map.merge(%Mcex.Mappings{})
@@ -16,10 +31,16 @@ defmodule Mcex.Modifier.HaveTest do
     test "expects `mappings` to contain key/value modifiers, 'get' and 'set'", do: true
     test "expects `mappings` to contain the 'trap' modifier (from `%Mcex.Mappings{}`)", do: true
 
-    test "shows stats for a key that doesn't exist (or is empty)", %{mappings: mappings} do
-      assert Have.modify("", "no.exist show", mappings) == {:ok, "one: n/a\nhav: 0\ntot: 0\navg: infinity"}
-      assert Have.modify("", "jon show", mappings) == {:ok, "one: n/a\nhav: 0\ntot: 0\navg: infinity"}
-      assert Have.modify("", "tim show", mappings) == {:ok, "one: n/a\nhav: 0\ntot: 0\navg: infinity"}
+    @error {:error, "Mcex.Modifier.Have: no dates"}
+
+    test "errors with a key that doesn't exist (or is 'empty')", %{mappings: mappings} do
+      assert Have.modify("", "no.exist show", mappings) == @error
+      assert Have.modify("", "tim show", mappings) == @error
+      assert Have.modify("", "jon show", mappings) == @error
+    end
+
+    test "errors with a key containing 'bad' dates", %{mappings: mappings} do
+      assert Have.modify("", "bob show", mappings) == {:error, "Mcex.Modifier.Have: dates parse"}
     end
 
     test "adds today as a 'have' day", %{mappings: mappings} do
@@ -29,9 +50,7 @@ defmodule Mcex.Modifier.HaveTest do
     end
 
     test "shows stats for a non-empty key", %{mappings: mappings} do
-      today = "#{Date.utc_today()}"
-      Have.modify("", "dan", mappings)
-      assert Have.modify("", "dan show", mappings) == {:ok, "one: #{today}\nhav: 1\ntot: 1\navg: n/a"}
+      assert Have.modify("", "dan show", mappings) == {:ok, "one: #{day_1()}\nhav: 2\ntot: 8\navg: 3.0\nint: 4, 2"}
     end
   end
 end

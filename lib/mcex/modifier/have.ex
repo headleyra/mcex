@@ -36,16 +36,21 @@ defmodule Mcex.Modifier.Have do
     {:ok, date_str} = Mc.m(script, mappings)
 
     case Mcex.Have.stats(date_str, Date.utc_today()) do
-      :error ->
-        oops("parse")
+      {:error, :nodates} ->
+        oops("no dates")
+
+      {:error, :parse} ->
+        oops("dates parse")
 
       stats ->
+        intervals = Enum.join(stats.int, ", ")
+
         result = """
         one: #{stats.one}
         hav: #{stats.hav}
         tot: #{stats.tot}
         avg: #{stats.avg}
-        cur: #{stats.cur}
+        int: #{intervals}
         """
 
         {:ok, String.trim_trailing(result)}

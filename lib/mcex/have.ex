@@ -1,11 +1,9 @@
 defmodule Mcex.Have do
   def stats(date_str, today) do
-    cond do
-      blank?(date_str) ->
-        %{one: "n/a", tot: 0, hav: 0, avg: "infinity", cur: "n/a"}
-
-      true ->
-        calc_or_error(date_str, today)
+    if blank?(date_str) do
+      {:error, :nodates}
+    else
+      calc_or_error(date_str, today)
     end
   end
 
@@ -15,47 +13,48 @@ defmodule Mcex.Have do
 
   defp calc_or_error(date_str, today) do
     case dates(date_str) do
-      {:error, _} ->
-        :error
+      {:error, :parse} ->
+        {:error, :parse}
 
       valid_dates ->
         calc(valid_dates, today)
     end
   end
 
-  defp calc([date], today) when date == today do
-    %{one: date, tot: 1, hav: 1, avg: "n/a", cur: 0}
+  defp intervals({result, [date_1, date_2 | rest]}, today) do
+    next_interval = Date.diff(date_2, date_1) - 1
+    intervals({[next_interval | result], [date_2 | rest]}, today)
+  end
+
+  defp intervals({result, [date]}, today) do
+    last_interval = Date.diff(today, date)
+    Enum.reverse([last_interval | result])
+  end
+
+  defp intervals(dates, today) do
+    intervals({[], dates}, today)
   end
 
   defp calc(have_dates, today) do
     all_dates = concat(have_dates, today)
     {first_day, last_day} = first_last_day(all_dates)
-    {_, last_have_day} = first_last_day(have_dates)
     days_count = days_count(first_day, last_day)
-    have_days_count = have_days(have_dates)
-    intervals = intervals(all_dates)
-    current_interval = current_interval(last_have_day, today)
+    have_days_count = Enum.count(have_dates)
 
-    if intervals > 0 do
-      average_interval_precise = (days_count - have_days_count) / intervals
-      average_interval = Float.round(average_interval_precise, 2)
+    intervals = intervals(have_dates, today)
+    intervals_count = Enum.count(intervals)
+    recent_intervals = Enum.take(intervals, -2)
 
-      %{
-        one: first_day,
-        tot: days_count,
-        hav: have_days_count,
-        avg: average_interval,
-        cur: current_interval
-      }
-    else
-      %{
-        one: "undefined",
-        tot: "undefined",
-        hav: "undefined",
-        avg: "undefined",
-        cur: "undefined"
-      }
-    end
+    average_interval_precise = Enum.sum(intervals) / intervals_count
+    average_interval = Float.round(average_interval_precise, 2)
+
+    %{
+      one: first_day,
+      tot: days_count,
+      hav: have_days_count,
+      avg: average_interval,
+      int: recent_intervals
+    }
   end
 
   defp dates(date_str) do
@@ -77,29 +76,21 @@ defmodule Mcex.Have do
     do
       {:cont, [date | acc]}
     else
-      _foo ->
+      _parse_error ->
         {:halt, {:error, :parse}}
     end
   end
 
   defp sort_uniqueify(dates) do
     case dates do
-      {:error, _} ->
-        dates
+      {:error, :parse} ->
+        {:error, :parse}
 
       _ok ->
         dates
         |> Enum.sort(Date)
         |> Enum.uniq()
     end
-  end
-
-  defp have_days(dates) do
-    Enum.count(dates)
-  end
-
-  defp current_interval(last_have_day, today) do
-    Date.diff(today, last_have_day)
   end
 
   defp first_last_day(dates) do
@@ -110,10 +101,6 @@ defmodule Mcex.Have do
 
   defp days_count(first_day, last_day) do
     Date.diff(last_day, first_day) + 1
-  end
-
-  defp intervals(dates) do
-    Enum.count(dates) - 1
   end
 
   defp concat(dates, today) do
