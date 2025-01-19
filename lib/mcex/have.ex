@@ -43,7 +43,7 @@ defmodule Mcex.Have do
 
     intervals = intervals(have_dates, today)
     intervals_count = Enum.count(intervals)
-    recent_intervals = Enum.take(intervals, -2)
+    recent_intervals = Enum.take(intervals, -3)
 
     average_interval_precise = Enum.sum(intervals) / intervals_count
     average_interval = Float.round(average_interval_precise, 2)

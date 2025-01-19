@@ -37,13 +37,13 @@ defmodule Mcex.HaveTest do
 
     test "works with 2 or more dates (where <today> == <last have date>)" do
       assert Have.stats(ds([1, 2]), d(2)) == %{one: d(1), tot: 2, hav: 2, avg: 0, int: [0, 0]}
-      assert Have.stats(ds([2, 5, 11]), d(11)) == %{one: d(2), tot: 10, hav: 3, avg: 2.33, int: [5, 0]}
+      assert Have.stats(ds([2, 5, 11]), d(11)) == %{one: d(2), tot: 10, hav: 3, avg: 2.33, int: [2, 5, 0]}
     end
 
     test "works with 2 or more dates (regardless of chronological order)" do
       assert Have.stats(ds([2, 1]), d(5)) == %{one: d(1), tot: 5, hav: 2, avg: 1.5, int: [0, 3]}
-      assert Have.stats(ds([2, 1, 5]), d(7)) == %{one: d(1), tot: 7, hav: 3, avg: 1.33, int: [2, 2]}
-      assert Have.stats(ds([9, 7, 1]), d(12)) == %{one: d(1), tot: 12, hav: 3, avg: 3.0, int: [1, 3]}
+      assert Have.stats(ds([2, 1, 5]), d(7)) == %{one: d(1), tot: 7, hav: 3, avg: 1.33, int: [0, 2, 2]}
+      assert Have.stats(ds([9, 7, 1]), d(12)) == %{one: d(1), tot: 12, hav: 3, avg: 3.0, int: [5, 1, 3]}
     end
 
     test "treats duplicate dates as one date" do
