@@ -12,7 +12,7 @@ defmodule Mcex.HaveTest do
     tot: total number of days
     hav: number of 'have' days
     avg: average interval between 'have' days
-    int: the last 2 intervals
+    int: last 3 intervals
     """
 
     test the_map, do: true
