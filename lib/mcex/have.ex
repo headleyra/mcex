@@ -1,47 +1,51 @@
 defmodule Mcex.Have do
   def stats(date_str, today) do
+    dates = dateify(date_str)
+    intervals = ints(dates, today)
+    calc(dates, intervals, today)
+  end
+
+  def intervals(date_str, today) do
+    date_str
+    |> dateify()
+    |> ints(today)
+  end
+
+  defp dateify(date_str) do
     if blank?(date_str) do
       {:error, :nodates}
     else
-      calc_or_error(date_str, today)
+      date_str
+      |> String.split()
+      |> Enum.reduce_while([], fn str, acc -> to_date(str, acc) end)
+      |> sort_uniqueify()
     end
   end
 
-  defp blank?(str) do
-    String.match?(str, ~r/^\s*$/)
-  end
+  defp ints({:error, reason}, _today), do: {:error, reason}
 
-  defp calc_or_error(date_str, today) do
-    case dates(date_str) do
-      {:error, :parse} ->
-        {:error, :parse}
-
-      valid_dates ->
-        calc(valid_dates, today)
-    end
-  end
-
-  defp intervals({result, [date_1, date_2 | rest]}, today) do
+  defp ints({result, [date_1, date_2 | rest]}, today) do
     next_interval = Date.diff(date_2, date_1) - 1
-    intervals({[next_interval | result], [date_2 | rest]}, today)
+    ints({[next_interval | result], [date_2 | rest]}, today)
   end
 
-  defp intervals({result, [date]}, today) do
+  defp ints({result, [date]}, today) do
     last_interval = Date.diff(today, date)
     Enum.reverse([last_interval | result])
   end
 
-  defp intervals(dates, today) do
-    intervals({[], dates}, today)
+  defp ints(dates, today) do
+    ints({[], dates}, today)
   end
 
-  defp calc(have_dates, today) do
+  defp calc({:error, reason}, _intervals, _today), do: {:error, reason}
+
+  defp calc(have_dates, intervals, today) do
     all_dates = concat(have_dates, today)
     {first_day, last_day} = first_last_day(all_dates)
     days_count = days_count(first_day, last_day)
     have_days_count = Enum.count(have_dates)
 
-    intervals = intervals(have_dates, today)
     intervals_count = Enum.count(intervals)
     recent_intervals = Enum.take(intervals, -3)
 
@@ -57,11 +61,8 @@ defmodule Mcex.Have do
     }
   end
 
-  defp dates(date_str) do
-    date_str
-    |> String.split()
-    |> Enum.reduce_while([], fn str, acc -> to_date(str, acc) end)
-    |> sort_uniqueify()
+  defp blank?(str) do
+    String.match?(str, ~r/^\s*$/)
   end
 
   defp to_date(str, acc) do

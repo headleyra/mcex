@@ -61,6 +61,51 @@ defmodule Mcex.HaveTest do
     end
   end
 
+  describe "intervals/2" do
+    test "errors with an 'empty' dates string" do
+      assert Have.intervals("\n \t ", d(8)) == {:error, :nodates}
+      assert Have.intervals("", d(8)) == {:error, :nodates}
+    end
+
+    test "works with 1 date" do
+      assert Have.intervals(ds(2), d(3)) == [1]
+      assert Have.intervals(ds(11), d(15)) == [4]
+    end
+
+    test "works with 1 date (where <today> == <the have date>)" do
+      assert Have.intervals(ds(2), d(2)) == [0]
+    end
+
+    test "works with 2 or more dates (white space separated)" do
+      assert Have.intervals("#{ds(1)} #{ds(2)}", d(5)) == [0, 3]
+    end
+
+    test "works with 2 or more dates (where <today> == <last have date>)" do
+      assert Have.intervals(ds([1, 2]), d(2)) == [0, 0]
+      assert Have.intervals(ds([2, 5, 11]), d(11)) == [2, 5, 0]
+    end
+
+    test "works with 2 or more dates (regardless of chronological order)" do
+      assert Have.intervals(ds([2, 1]), d(5)) == [0, 3]
+      assert Have.intervals(ds([2, 1, 5]), d(7)) == [0, 2, 2]
+      assert Have.intervals(ds([9, 7, 1]), d(12)) == [5, 1, 3]
+    end
+
+    test "treats duplicate dates as one date" do
+      int1 = Have.intervals(ds([11, 11]), d(15))
+      int2 = Have.intervals(ds([11, 11, 11]), d(15))
+
+      assert int1 == [4]
+      assert int1 == int2
+    end
+
+    test "errors with bad dates" do
+      assert Have.intervals("2014-01-05 2011-5-123", d(15)) == {:error, :parse}
+      assert Have.intervals("1987.3.7", d(5)) == {:error, :parse}
+      assert Have.intervals("foo-bar-biz", d(7)) == {:error, :parse}
+    end
+  end
+
   defp d(d) do
     Date.new!(2017, 1, d) 
   end
