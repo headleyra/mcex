@@ -1,47 +1,44 @@
 defmodule Mcex.Have do
-  def stats(date_str, today) do
-    dates = dateify(date_str)
-    intervals = ints(dates, today)
-    calc(dates, intervals, today)
+  def stats(date_str, cut_off_date) do
+    dates = dateify(date_str, cut_off_date)
+    intervals = intervals(dates, [], cut_off_date)
+    calc(dates, intervals, cut_off_date)
   end
 
-  def intervals(date_str, today) do
+  def intervals(date_str, cut_off_date) do
     date_str
-    |> dateify()
-    |> ints(today)
+    |> dateify(cut_off_date)
+    |> intervals([], cut_off_date)
   end
 
-  defp dateify(date_str) do
+  defp dateify(date_str, cut_off_date) do
     if blank?(date_str) do
-      {:error, :nodates}
+      {:error, :no_dates}
     else
       date_str
       |> String.split()
       |> Enum.reduce_while([], fn str, acc -> to_date(str, acc) end)
       |> sort_uniqueify()
+      |> discard_after_cut_off(cut_off_date)
     end
   end
 
-  defp ints({:error, reason}, _today), do: {:error, reason}
+  defp intervals({:error, reason}, _current_intervals, _cut_off_date), do: {:error, reason}
 
-  defp ints({result, [date_1, date_2 | rest]}, today) do
+  defp intervals([date_1, date_2 | rest], current_intervals, cut_off_date) do
     next_interval = Date.diff(date_2, date_1) - 1
-    ints({[next_interval | result], [date_2 | rest]}, today)
+    intervals([date_2 | rest], [next_interval | current_intervals], cut_off_date)
   end
 
-  defp ints({result, [date]}, today) do
-    last_interval = Date.diff(today, date)
-    Enum.reverse([last_interval | result])
+  defp intervals([date], current_intervals, cut_off_date) do
+    last_interval = Date.diff(cut_off_date, date)
+    Enum.reverse([last_interval | current_intervals])
   end
 
-  defp ints(dates, today) do
-    ints({[], dates}, today)
-  end
+  defp calc({:error, reason}, _intervals, _cut_off_date), do: {:error, reason}
 
-  defp calc({:error, reason}, _intervals, _today), do: {:error, reason}
-
-  defp calc(have_dates, intervals, today) do
-    all_dates = concat(have_dates, today)
+  defp calc(have_dates, intervals, cut_off_date) do
+    all_dates = concat(have_dates, cut_off_date)
     {first_day, last_day} = first_last_day(all_dates)
     days_count = days_count(first_day, last_day)
     have_days_count = Enum.count(have_dates)
@@ -94,6 +91,12 @@ defmodule Mcex.Have do
     end
   end
 
+  defp discard_after_cut_off({:error, :parse}, _cut_off_date), do: {:error, :parse}
+
+  defp discard_after_cut_off(dates, cut_off_date) do
+    Enum.reject(dates, fn date -> Date.diff(cut_off_date, date) < 0 end)
+  end
+
   defp first_last_day(dates) do
     first = List.first(dates)
     last = Enum.at(dates, -1)
@@ -104,7 +107,7 @@ defmodule Mcex.Have do
     Date.diff(last_day, first_day) + 1
   end
 
-  defp concat(dates, today) do
-    dates ++ [today]
+  defp concat(dates, cut_off_date) do
+    dates ++ [cut_off_date]
   end
 end

@@ -34,9 +34,10 @@ defmodule Mcex.Modifier.Have do
     """
 
     {:ok, date_str} = Mc.m(script, mappings)
+    yesterday = Date.utc_today() |> Date.add(-1)
 
-    case Mcex.Have.stats(date_str, Date.utc_today()) do
-      {:error, :nodates} ->
+    case Mcex.Have.stats(date_str, yesterday) do
+      {:error, :no_dates} ->
         oops("no dates")
 
       {:error, :parse} ->
