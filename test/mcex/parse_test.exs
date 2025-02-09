@@ -35,15 +35,16 @@ defmodule Mcex.ParseTest do
       assert Parse.mapify("a:one %09    b:two") == %{a: "one \t", b: "two"}
     end
 
-    test "return an empty map given whitespace" do
+    test "returns an empty map given whitespace" do
       assert Parse.mapify("") == %{}
       assert Parse.mapify("  ") == %{}
       assert Parse.mapify("\t") == %{}
     end
 
-    test "errors with incomplete input" do
+    test "errors when input can't be parsed" do
       assert Parse.mapify("x") == :error
       assert Parse.mapify("x y") == :error
+      assert Parse.mapify("x::y") == :error
     end
   end
 
