@@ -2,6 +2,15 @@ defmodule Mcex.SelectTest do
   use ExUnit.Case, async: true
   alias Mcex.Select
 
+  describe "line_specs/1" do
+    test "parses a list of space-separated line specs" do
+      assert Select.line_specs("1") == [0]
+      assert Select.line_specs("2 5") == [1, 4]
+      assert Select.line_specs("2-4 8") == [[1, 2, 3], 7]
+      assert Select.line_specs("1-3 8-5") == [[0, 1, 2], [7, 6, 5, 4]]
+    end
+  end
+
   describe "parse/1" do
     test "parses a line spec" do
       assert Select.parse("1") == 0
@@ -10,10 +19,10 @@ defmodule Mcex.SelectTest do
       assert Select.parse("5-1") == [4, 3, 2, 1, 0]
     end
 
-    test "errors on 'bad' line specs" do
+    test "errors on bad line specs" do
       assert Select.parse("0") == :error
       assert Select.parse("0-2") == :error
-      assert Select.parse("0--11") == :error
+      assert Select.parse("2--11") == :error
       assert Select.parse("^-11") == :error
       assert Select.parse("foobar") == :error
     end

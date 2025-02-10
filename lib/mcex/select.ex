@@ -1,6 +1,7 @@
 defmodule Mcex.Select do
-  def line_specs(str) do
-    String.split(str, ",")
+  def line_specs(string) do
+    string
+    |> String.split()
     |> Enum.map(fn line_spec -> parse(line_spec) end)
   end
 

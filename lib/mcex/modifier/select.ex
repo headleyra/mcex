@@ -3,18 +3,29 @@ defmodule Mcex.Modifier.Select do
 
   def modify(buffer, args, _mappings) do
     buffer_lines = String.split(buffer, "\n")
-    line_specs = Mcex.Select.line_specs(args)
 
-    if Enum.any?(line_specs, fn line_spec -> line_spec == :error end) do
-      oops("bad line spec(s)")
-    else
-      {:ok,
-        line_specs
-        |> List.flatten()
-        |> Enum.reduce([], fn line, acc -> [Enum.at(buffer_lines, line) | acc] end)
-        |> Enum.reverse()
-        |> Enum.join("\n")
-      }
-    end
+    args
+    |> Mcex.Select.line_specs()
+    |> List.flatten()
+    |> Enum.reduce_while([], fn index, acc -> lineify(buffer_lines, index, acc) end)
+    |> result()
+  end
+
+  defp lineify(_buffer_lines, :error, _acc) do
+    {:halt, oops("bad line spec(s)")}
+  end
+
+  defp lineify(buffer_lines, index, acc) do
+    {:cont, [Enum.at(buffer_lines, index) | acc]}
+  end
+
+  defp result({:error, reason}), do: {:error, reason}
+
+  defp result(lines) do
+    {:ok,
+      lines
+      |> Enum.reverse()
+      |> Enum.join("\n")
+    }
   end
 end
