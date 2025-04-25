@@ -42,6 +42,11 @@ defmodule Mcex.HaveTest do
       assert Have.stats(ds([9, 7, 1]), d(12)) == %{one: d(1), tot: 12, hav: 3, avg: 3.0, int: [5, 1, 3]}
     end
 
+    test "works with 'have' dates in the future" do
+      assert Have.stats(ds(7), d(5)) == %{one: "n/a", tot: 0, hav: 0, avg: 0, int: []}
+      assert Have.stats(ds(2), d(1)) == %{one: "n/a", tot: 0, hav: 0, avg: 0, int: []}
+    end
+
     test "treats duplicate 'have' dates as one date" do
       s1 = Have.stats(ds([11, 11]), d(15))
       s2 = Have.stats(ds([11, 11, 11]), d(15))

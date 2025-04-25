@@ -35,7 +35,21 @@ defmodule Mcex.Have do
     Enum.reverse([last_interval | current_intervals])
   end
 
+  defp intervals(_dates, _current_intervals, _cut_off_date) do
+    []
+  end
+
   defp calc({:error, reason}, _intervals, _cut_off_date), do: {:error, reason}
+
+  defp calc([], _intervals, _cut_off_date) do
+    %{
+      one: "n/a",
+      tot: 0,
+      hav: 0,
+      avg: 0,
+      int: []
+    }
+  end
 
   defp calc(have_dates, intervals, cut_off_date) do
     all_dates = concat(have_dates, cut_off_date)
