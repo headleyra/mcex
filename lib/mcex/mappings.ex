@@ -25,6 +25,7 @@ defmodule Mcex.Mappings do
     timeu: Mcex.Modifier.TimeU,
     trap: Mcex.Modifier.Trap,
     trunc: Mcex.Modifier.Truncate,
+    uniq: Mcex.Modifier.Uniq,
     urid: Mcex.Modifier.UriD,
     urie: Mcex.Modifier.UriE,
     urljson: Mcex.Modifier.Urljson,
