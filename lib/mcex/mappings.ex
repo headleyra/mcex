@@ -28,7 +28,6 @@ defmodule Mcex.Mappings do
     uniq: Mcex.Modifier.Uniq,
     urid: Mcex.Modifier.UriD,
     urie: Mcex.Modifier.UriE,
-    urljson: Mcex.Modifier.Urljson,
     uuid: Mcex.Modifier.Uuid,
     wrap: Mcex.Modifier.Wrap,
 
