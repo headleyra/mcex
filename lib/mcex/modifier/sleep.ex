@@ -3,8 +3,8 @@ defmodule Mcex.Modifier.Sleep do
 
   def modify(buffer, args, _mappings) do
     case Mc.String.to_int(args) do
-      {:ok, seconds} when seconds > 0 ->
-        Process.sleep(seconds * 1_000)
+      {:ok, ms} when ms > 0 ->
+        Process.sleep(ms)
         {:ok, buffer}
 
       _bad_seconds ->
