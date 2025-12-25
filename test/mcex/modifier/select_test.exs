@@ -13,7 +13,7 @@ defmodule Mcex.Modifier.SelectTest do
       assert Select.modify("one\ntwo\nthree\nfour\nfive", "3-1 5", %{}) == {:ok, "three\ntwo\none\nfive"}
     end
 
-    @errmsg "Mcex.Modifier.Select: bad line spec(s)"
+    @errmsg "Mcex.Modifier.Select: bad line spec"
 
     test "errors given bad line specs" do
       assert Select.modify("one\ntwo", "oops", %{}) == {:error, @errmsg}
