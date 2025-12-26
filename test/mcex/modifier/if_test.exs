@@ -16,6 +16,10 @@ defmodule Mcex.Modifier.IfTest do
       assert If.modify("howdy", ", h.wdi, date, range 3", mappings) == {:ok, "1\n2\n3"}
     end
 
+    test "runs against the `buffer`", %{mappings: mappings} do
+      assert If.modify("foo", ", no-match, b foo, append -bar", mappings) == {:ok, "foo-bar"}
+    end
+
     @parse_err "Mcex.Modifier.If: parse error"
 
     test "detects parse errors" do
