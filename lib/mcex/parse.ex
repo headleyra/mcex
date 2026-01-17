@@ -1,12 +1,12 @@
 defmodule Mcex.Parse do
   def split(string) do
     case parse(string) do
-      [separator, parts] ->
+      [separator, rest_of_string] ->
         uri_separator = URI.decode(separator)
-        String.split(parts, "#{uri_separator} ")
+        String.split(rest_of_string, "#{uri_separator} ")
 
-      [_separator] ->
-        [""]
+      _unsplittable_string ->
+        [string]
     end
   end
 
