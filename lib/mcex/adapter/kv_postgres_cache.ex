@@ -26,20 +26,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
 
   @impl true
   def get(key) do
-    if Map.has_key?(cache(), key) do
-      {:ok, Map.get(cache(), key)}
-    else
-      Logger.info("===== CACHE MISS: #{key}")
-
-      case db_get(key) do
-        {:ok, value} ->
-          Agent.update(@cache_pid, fn cache -> Map.put(cache, key, value) end)
-          {:ok, value}
-
-        {:error, reason} ->
-          {:error, reason}
-      end
-    end
+    if Map.has_key?(cache(), key), do: get_cache_hit(key), else: get_cache_miss(key)
   end
 
   @impl true
@@ -84,6 +71,23 @@ defmodule Mcex.Adapter.KvPostgresCache do
     Logger.info(result)
   end
 
+  defp get_cache_hit(key) do
+    {:ok, Map.get(cache(), key)}
+  end
+
+  defp get_cache_miss(key) do
+    Logger.info("===== CACHE MISS: #{key}")
+
+    case db_get(key) do
+      {:ok, value} ->
+        Agent.update(@cache_pid, fn cache -> Map.put(cache, key, value) end)
+        {:ok, value}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
   defp tupleize_regex_query(key_or_value, vars) do
     case Postgrex.query(@db_pid, "SELECT * FROM #{@db_table} WHERE #{key_or_value} ~ $1", vars) do
       {:ok, %Postgrex.Result{num_rows: row_count, rows: rows_list}} when row_count > 0 ->
@@ -97,8 +101,7 @@ defmodule Mcex.Adapter.KvPostgresCache do
   defp tupleize_rows_list(rows_list) do
     {:ok,
       rows_list
-      |> Enum.map(fn [key, _value] -> key end)
-      |> Enum.join("\n")
+      |> Enum.map_join("\n", fn [key, _value] -> key end)
     }
   end
 

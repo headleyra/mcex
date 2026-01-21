@@ -42,8 +42,7 @@ defmodule Mcex.Adapter.KvRedis do
           keys("*")
           |> Enum.map(fn key -> {key, get(key)} end)
           |> Enum.filter(fn {_key, {:ok, value}} -> Regex.match?(regex, value) end)
-          |> Enum.map(fn {key, {:ok, _value}} -> key end)
-          |> Enum.join("\n")
+          |> Enum.map_join("\n", fn {key, {:ok, _value}} -> key end)
         }
 
       {:error, _} ->

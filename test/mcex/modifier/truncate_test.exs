@@ -19,14 +19,14 @@ defmodule Mcex.Modifier.TruncateTest do
       assert Truncate.modify("", "100", %{}) == {:ok, ""}
     end
 
-    @errmsg "Mcex.Modifier.Truncate: bad character count"
+    @err "Mcex.Modifier.Truncate: bad truncate count"
 
     test "errors when the character count isn't a positive integer" do
-      assert Truncate.modify("tea", "0", %{}) == {:error, @errmsg}
-      assert Truncate.modify("milk", "-1", %{}) == {:error, @errmsg}
-      assert Truncate.modify("", "-71", %{}) == {:error, @errmsg}
-      assert Truncate.modify("sugar", "foobar", %{}) == {:error, @errmsg}
-      assert Truncate.modify("honey", "3.142", %{}) == {:error, @errmsg}
+      assert Truncate.modify("tea", "0", %{}) == {:error, @err}
+      assert Truncate.modify("milk", "-1", %{}) == {:error, @err}
+      assert Truncate.modify("", "-71", %{}) == {:error, @err}
+      assert Truncate.modify("sugar", "foobar", %{}) == {:error, @err}
+      assert Truncate.modify("honey", "3.142", %{}) == {:error, @err}
     end
 
     test "works with ok tuples" do

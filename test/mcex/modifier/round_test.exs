@@ -2,7 +2,7 @@ defmodule Mcex.Modifier.RoundTest do
   use ExUnit.Case, async: true
   alias Mcex.Modifier.Round
 
-  describe "Mcex.Modifier.Round.modify/2" do
+  describe "Mcex.Modifier.Round.modify/3" do
     test "rounds a float to a given decimal precision" do
       assert Round.modify("1.28", "1", %{}) == {:ok, "1.3"}
       assert Round.modify("3.142", "2", %{}) == {:ok, "3.14"}

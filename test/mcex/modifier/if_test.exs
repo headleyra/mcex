@@ -3,7 +3,7 @@ defmodule Mcex.Modifier.IfTest do
   alias Mcex.Modifier.If
 
   setup do
-    %{mappings: %Mc.Mappings{}}
+    %{mappings: Mc.Mappings.s()}
   end
 
   describe "modify/3" do

@@ -1,10 +1,18 @@
 defmodule Mcex.MappingsTest do
   use ExUnit.Case, async: true
+  alias Mcex.Mappings
 
-  describe "%Mcex.Mappings{}" do
+  describe "standard/0" do
     test "defines modifiers that exist" do
-      %Mcex.Mappings{}
-      |> Map.from_struct()
+      Mappings.standard()
+      |> Map.values()
+      |> Enum.each(fn module -> exists?(module) end)
+    end
+  end
+
+  describe "s/0" do
+    test "defines modifiers that exist" do
+      Mappings.s()
       |> Map.values()
       |> Enum.each(fn module -> exists?(module) end)
     end

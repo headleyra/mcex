@@ -14,7 +14,7 @@ defmodule Mcex.Modifier.HaveTest do
       "ft2" => "#{ago(0)} #{ago(-1)}"
     }})
 
-    mappings = %Mc.Mappings{} |> Map.merge(%Mcex.Mappings{})
+    mappings = Mc.Mappings.s() |> Map.merge(Mcex.Mappings.s())
     %{mappings: mappings}
   end
 

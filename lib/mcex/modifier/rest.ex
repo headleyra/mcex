@@ -2,14 +2,13 @@ defmodule Mcex.Modifier.Rest do
   use Mc.Modifier
 
   def modify(buffer, _args, _mappings) do
-    with \
-      [_ | rest] <- String.split(buffer, "\n")
-    do
-      result = Enum.join(rest, "\n")
-      {:ok, result}
-    else
+    case String.split(buffer, "\n") do
+      [_ | rest] ->
+        result = Enum.join(rest, "\n")
+        {:ok, result}
+
       _ ->
-        oops("no lines?")
+        oops("no lines")
     end
   end
 end
