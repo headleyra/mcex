@@ -18,7 +18,7 @@ defmodule Mcex.Modifier.Have do
     script = """
     get #{key}
     trap
-    b {}; {date}
+    buffer {}; {date}
     trim
     set #{key}
     date
@@ -28,29 +28,37 @@ defmodule Mcex.Modifier.Have do
   end
 
   defp show(key, mappings) do
-    script = """
-    get #{key}
-    trap
-    """
-
-    {:ok, date_str} = Mc.m(script, mappings)
     yesterday = Date.utc_today() |> Date.add(-1)
 
-    case Mcex.Have.stats(date_str, yesterday) do
-      {:error, :no_dates} ->
-        oops("no dates")
+    with \
+      {:ok, date_str} <- Mc.m("get #{key}", mappings),
+      false <- String.match?(date_str, ~r/^\s*$/)
+    do
+      date_str
+      |> Mcex.Have.stats(yesterday)
+      |> render()
+    else
+      true ->
+        oops("whitespace dates")
 
+      {:error, _not_found} ->
+        oops("dates key not found")
+    end
+  end
+
+  defp render(stats) do
+    case stats do
       {:error, :parse} ->
-        oops("dates parse")
+        oops("bad dates")
 
-      stats ->
-        intervals = Enum.join(stats.int, ", ")
+      s->
+        intervals = Enum.join(s.int, ", ")
 
         result = """
-        one: #{stats.one}
-        hav: #{stats.hav}
-        tot: #{stats.tot}
-        avg: #{stats.avg}
+        one: #{s.one}
+        hav: #{s.hav}
+        tot: #{s.tot}
+        avg: #{s.avg}
         int: #{intervals}
         """
 

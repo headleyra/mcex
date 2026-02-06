@@ -3,20 +3,15 @@ defmodule Mcex.HaveTest do
   alias Mcex.Have
 
   describe "stats/2" do
-    test "calculates the average interval between 'have' days", do: true
-    test "expects a 'cut off' date as the 2nd argument", do: true
-    test "calculates stats up to the 'cut off' date", do: true
-
-    the_map = """
+    result = """
     returns a map with the following keys:
     one: first 'have' date
-    tot: total number of days (up to the 'cut off' date)
+    tot: total number of days up to (and including) the `cut_off_date`
     hav: number of 'have' days
     avg: average interval between 'have' days
-    int: last 3 intervals
+    int: last 3 intervals (most recent, last)
     """
-
-    test the_map, do: true
+    test result, do: true
 
     test "works with 1 'have' date" do
       assert Have.stats(ds(2), d(3)) == %{one: d(2), tot: 2, hav: 1, avg: 1, int: [1]}
@@ -55,9 +50,9 @@ defmodule Mcex.HaveTest do
       assert s1 == s2
     end
 
-    test "errors with an 'empty' dates string" do
-      assert Have.stats("", d(5)) == {:error, :no_dates}
-      assert Have.stats("\n \t ", d(8)) == {:error, :no_dates}
+    test "works with 'empty' dates" do
+      assert Have.stats("", d(5)) == %{avg: 0, hav: 0, int: [], one: "n/a", tot: 0}
+      assert Have.stats("\n \t ", d(8)) == %{avg: 0, hav: 0, int: [], one: "n/a", tot: 0}
     end
 
     test "errors with bad 'have' dates" do
@@ -101,9 +96,9 @@ defmodule Mcex.HaveTest do
       assert int1 == int2
     end
 
-    test "errors with an 'empty' dates string" do
-      assert Have.intervals("\n \t ", d(8)) == {:error, :no_dates}
-      assert Have.intervals("", d(8)) == {:error, :no_dates}
+    test "returns [] with an empty date string" do
+      assert Have.intervals("\n \t", d(8)) == []
+      assert Have.intervals("", d(7)) == []
     end
 
     test "errors with bad dates" do
@@ -113,15 +108,12 @@ defmodule Mcex.HaveTest do
     end
   end
 
-  defp d(d) do
-    Date.new!(2017, 1, d) 
-  end
-
-  defp ds(day) when is_integer(day) do
-    "2017-1-#{day}"
-  end
+  defp d(day), do: Date.new!(2017, 1, day) 
 
   defp ds(days) when is_list(days) do
-    Enum.map_join(days, "\n", fn day -> "2017-1-#{day}" end)
+    Enum.map_join(days, "\n", fn day -> ds(day) end)
   end
+
+  defp ds(day) when day < 10, do: "2017-01-0#{day}"
+  defp ds(day), do: "2017-01-#{day}"
 end

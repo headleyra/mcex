@@ -14,15 +14,20 @@ defmodule Mcex.Modifier.HaveTest do
       "ft2" => "#{ago(0)} #{ago(-1)}"
     }})
 
-    mappings = Mc.Mappings.s() |> Map.merge(Mcex.Mappings.s())
+    mappings = %{
+      get: Mc.Modifier.Get,
+      set: Mc.Modifier.Set,
+      buffer: Mc.Modifier.Buffer,
+      trim: Mc.Modifier.Trim,
+      trap: Mcex.Modifier.Trap,
+      date: Mcex.Modifier.Date
+    }
+
     %{mappings: mappings}
   end
 
   describe "modify/3" do
-    test "expects `mappings` to contain key/value modifiers, 'get' and 'set'", do: true
-    test "expects `mappings` to contain the 'trap' modifier (from `%Mcex.Mappings{}`)", do: true
-
-    test "shows stats for a non-empty key (up to yesterday)", %{mappings: mappings} do
+    test "shows stats for a key (up to, and including, yesterday)", %{mappings: mappings} do
       assert Have.modify("", "dan show", mappings) == {:ok, "one: #{ago(7)}\nhav: 2\ntot: 7\navg: 2.5\nint: 1, 4"}
       assert Have.modify("", "jed show", mappings) == {:ok, "one: #{ago(7)}\nhav: 3\ntot: 7\navg: 1.33\nint: 1, 1, 2"}
       assert Have.modify("", "neo show", mappings) == {:ok, "one: #{ago(5)}\nhav: 2\ntot: 5\navg: 1.5\nint: 1, 2"}
@@ -39,16 +44,17 @@ defmodule Mcex.Modifier.HaveTest do
       assert Mc.m("get sam", mappings) == {:ok, today}
     end
 
-    @error {:error, "Mcex.Modifier.Have: no dates"}
+    test "errors when a key contains whitespace", %{mappings: mappings} do
+      assert Have.modify("", "tim show", mappings) == {:error, "Mcex.Modifier.Have: whitespace dates"}
+      assert Have.modify("", "jon show", mappings) == {:error, "Mcex.Modifier.Have: whitespace dates"}
+    end
 
-    test "errors with a key that doesn't exist (or is 'empty')", %{mappings: mappings} do
-      assert Have.modify("", "no.exist show", mappings) == @error
-      assert Have.modify("", "tim show", mappings) == @error
-      assert Have.modify("", "jon show", mappings) == @error
+    test "errors when a key doesn't exist", %{mappings: mappings} do
+      assert Have.modify("", "no.exist show", mappings) == {:error, "Mcex.Modifier.Have: dates key not found"}
     end
 
     test "errors with a key containing 'bad' dates", %{mappings: mappings} do
-      assert Have.modify("", "bob show", mappings) == {:error, "Mcex.Modifier.Have: dates parse"}
+      assert Have.modify("", "bob show", mappings) == {:error, "Mcex.Modifier.Have: bad dates"}
     end
   end
 
