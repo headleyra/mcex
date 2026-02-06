@@ -52,7 +52,10 @@ defmodule Mcex.Modifier.Have do
         oops("bad dates")
 
       s->
-        intervals = Enum.join(s.int, ", ")
+        intervals =
+          s.int
+          |> Enum.reverse()
+          |> Enum.join(", ")
 
         result = """
         one: #{s.one}

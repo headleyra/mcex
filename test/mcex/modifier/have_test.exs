@@ -28,9 +28,9 @@ defmodule Mcex.Modifier.HaveTest do
 
   describe "modify/3" do
     test "shows stats for a key (up to, and including, yesterday)", %{mappings: mappings} do
-      assert Have.modify("", "dan show", mappings) == {:ok, "one: #{ago(7)}\nhav: 2\ntot: 7\navg: 2.5\nint: 1, 4"}
-      assert Have.modify("", "jed show", mappings) == {:ok, "one: #{ago(7)}\nhav: 3\ntot: 7\navg: 1.33\nint: 1, 1, 2"}
-      assert Have.modify("", "neo show", mappings) == {:ok, "one: #{ago(5)}\nhav: 2\ntot: 5\navg: 1.5\nint: 1, 2"}
+      assert Have.modify("", "dan show", mappings) == {:ok, "one: #{ago(7)}\nhav: 2\ntot: 7\navg: 2.5\nint: 4, 1"}
+      assert Have.modify("", "jed show", mappings) == {:ok, "one: #{ago(7)}\nhav: 3\ntot: 7\navg: 1.33\nint: 2, 1, 1"}
+      assert Have.modify("", "neo show", mappings) == {:ok, "one: #{ago(5)}\nhav: 2\ntot: 5\navg: 1.5\nint: 2, 1"}
     end
 
     test "works with 'have' days that are in the future", %{mappings: mappings} do
