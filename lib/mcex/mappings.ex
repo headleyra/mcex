@@ -21,7 +21,6 @@ defmodule Mcex.Mappings do
       rand: X.Random,
       rest: X.Rest,
       round: X.Round,
-      select: X.Select,
       sleep: X.Sleep,
       splitc: X.SplitC,
       tee: X.Tee,
