@@ -6,7 +6,7 @@ defmodule Mcex do
     Path.join(dir, @glob)
     |> Path.wildcard()
     |> Enum.map(fn file -> {Path.basename(file), File.read!(file)} end)
-    |> Enum.map(fn {file, setm} -> {file, Mc.modify(setm, @setm_modifier, mappings)} end)
+    |> Enum.map(fn {file, setm} -> {file, Mc.m(setm, @setm_modifier, mappings)} end)
     |> Enum.map(fn file_result -> summarize(file_result) end)
   end
 

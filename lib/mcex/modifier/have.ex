@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.Have do
   use Mc.Modifier
 
-  def modify(_buffer, args, mappings) do
+  def m(_buffer, args, mappings) do
     case String.split(args) do
       [key] ->
         add_date(key, mappings)

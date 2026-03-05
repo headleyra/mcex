@@ -26,35 +26,35 @@ defmodule Mcex.Modifier.HaveTest do
     %{mappings: mappings}
   end
 
-  describe "modify/3" do
+  describe "m/3" do
     test "shows stats for a key (up to, and including, yesterday)", %{mappings: mappings} do
-      assert Have.modify("", "dan show", mappings) == {:ok, "one: #{ago(7)}\nhav: 2\ntot: 7\navg: 2.5\nint: 4, 1"}
-      assert Have.modify("", "jed show", mappings) == {:ok, "one: #{ago(7)}\nhav: 3\ntot: 7\navg: 1.33\nint: 2, 1, 1"}
-      assert Have.modify("", "neo show", mappings) == {:ok, "one: #{ago(5)}\nhav: 2\ntot: 5\navg: 1.5\nint: 2, 1"}
+      assert Have.m("", "dan show", mappings) == {:ok, "one: #{ago(7)}\nhav: 2\ntot: 7\navg: 2.5\nint: 4, 1"}
+      assert Have.m("", "jed show", mappings) == {:ok, "one: #{ago(7)}\nhav: 3\ntot: 7\navg: 1.33\nint: 2, 1, 1"}
+      assert Have.m("", "neo show", mappings) == {:ok, "one: #{ago(5)}\nhav: 2\ntot: 5\navg: 1.5\nint: 2, 1"}
     end
 
     test "works with 'have' days that are in the future", %{mappings: mappings} do
-      assert Have.modify("", "ft1 show", mappings) == {:ok, "one: n/a\nhav: 0\ntot: 0\navg: 0\nint:"}
-      assert Have.modify("", "ft2 show", mappings) == {:ok, "one: n/a\nhav: 0\ntot: 0\navg: 0\nint:"}
+      assert Have.m("", "ft1 show", mappings) == {:ok, "one: n/a\nhav: 0\ntot: 0\navg: 0\nint:"}
+      assert Have.m("", "ft2 show", mappings) == {:ok, "one: n/a\nhav: 0\ntot: 0\navg: 0\nint:"}
     end
 
     test "adds today as a 'have' day", %{mappings: mappings} do
       today = "#{ago(0)}"
-      assert Have.modify("", "sam", mappings) == {:ok, today}
+      assert Have.m("", "sam", mappings) == {:ok, today}
       assert Mc.m("get sam", mappings) == {:ok, today}
     end
 
     test "errors when a key contains whitespace", %{mappings: mappings} do
-      assert Have.modify("", "tim show", mappings) == {:error, "Mcex.Modifier.Have: whitespace dates"}
-      assert Have.modify("", "jon show", mappings) == {:error, "Mcex.Modifier.Have: whitespace dates"}
+      assert Have.m("", "tim show", mappings) == {:error, "Mcex.Modifier.Have: whitespace dates"}
+      assert Have.m("", "jon show", mappings) == {:error, "Mcex.Modifier.Have: whitespace dates"}
     end
 
     test "errors when a key doesn't exist", %{mappings: mappings} do
-      assert Have.modify("", "no.exist show", mappings) == {:error, "Mcex.Modifier.Have: dates key not found"}
+      assert Have.m("", "no.exist show", mappings) == {:error, "Mcex.Modifier.Have: dates key not found"}
     end
 
     test "errors with a key containing 'bad' dates", %{mappings: mappings} do
-      assert Have.modify("", "bob show", mappings) == {:error, "Mcex.Modifier.Have: bad dates"}
+      assert Have.m("", "bob show", mappings) == {:error, "Mcex.Modifier.Have: bad dates"}
     end
   end
 

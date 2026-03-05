@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.Rest do
   use Mc.Modifier
 
-  def modify(buffer, _args, _mappings) do
+  def m(buffer, _args, _mappings) do
     case String.split(buffer, "\n") do
       [_ | rest] ->
         result = Enum.join(rest, "\n")

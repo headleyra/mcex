@@ -1,8 +1,8 @@
 defmodule Mcex.Modifier.Wrap do
   use Mc.Modifier
 
-  def modify(buffer, args, mappings) do
-    Mc.Modifier.Append.modify(buffer, args, mappings)
-    |> Mc.Modifier.Prepend.modify(args, mappings)
+  def m(buffer, args, mappings) do
+    Mc.Modifier.Append.m(buffer, args, mappings)
+    |> Mc.Modifier.Prepend.m(args, mappings)
   end
 end

@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.Mods do
   use Mc.Modifier
 
-  def modify(_buffer, _args, mappings) do
+  def m(_buffer, _args, mappings) do
     result =
       mappings
       |> Map.to_list()

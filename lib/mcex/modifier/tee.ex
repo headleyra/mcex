@@ -1,9 +1,9 @@
 defmodule Mcex.Modifier.Tee do
   use Mc.Modifier
 
-  def modify(buffer, args, mappings) do
+  def m(buffer, args, mappings) do
     script = args
-    Mc.modify(buffer, script, mappings)
+    Mc.m(buffer, script, mappings)
     {:ok, buffer}
   end
 end

@@ -12,10 +12,10 @@ defmodule Mcex.Modifier.ModsTest do
     %{mappings: mappings}
   end
 
-  describe "modify/3" do
+  describe "m/3" do
     test "lists modifiers in the mappings", %{mappings: mappings} do
-      assert Mods.modify("", "", %{}) == {:ok, ""}
-      assert Mods.modify("", "", mappings) == {:ok, "foo: Bar\nbiz: Niz"}
+      assert Mods.m("", "", %{}) == {:ok, ""}
+      assert Mods.m("", "", mappings) == {:ok, "foo: Bar\nbiz: Niz"}
     end
   end
 end

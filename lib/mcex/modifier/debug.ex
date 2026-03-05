@@ -2,7 +2,7 @@ defmodule Mcex.Modifier.Debug do
   use Mc.Modifier
   require Logger
 
-  def modify(buffer, args, _mappings) do
+  def m(buffer, args, _mappings) do
     case String.split(args, " ", parts: 2) do
       ["i", title] ->
         outp(title, inspect(buffer))

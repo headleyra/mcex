@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.FindX do
   use Mc.Modifier
 
-  def modify(_buffer, args, _mappings) do
+  def m(_buffer, args, _mappings) do
     with \
       {:parse, [key_regx_str, value_regex_str]} <- {:parse, Mc.Parse.split(args)},
       {:ok, result} <- apply(adapter(), :findx, [key_regx_str, value_regex_str])

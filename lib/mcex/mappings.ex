@@ -35,6 +35,4 @@ defmodule Mcex.Mappings do
       wrap: X.Wrap
     }
   end
-
-  def s, do: standard()
 end

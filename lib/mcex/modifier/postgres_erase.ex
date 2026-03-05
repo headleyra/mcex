@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.PostgresErase do
   use Mc.Modifier
 
-  def modify(_buffer, args, _mappings) do
+  def m(_buffer, args, _mappings) do
     adapter().delete(args)
   end
 

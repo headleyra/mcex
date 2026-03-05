@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.If do
   use Mc.Modifier
 
-  def modify(buffer, args, mappings) do
+  def m(buffer, args, mappings) do
     with \
       [regx_str, true_script, false_script] <- Mc.Parse.split(args),
       {:ok, regx} <- Regex.compile(regx_str)

@@ -1,7 +1,7 @@
 defmodule Mcex.Modifier.Truncate do
   use Mc.Modifier
 
-  def modify(buffer, args, _mappings) do
+  def m(buffer, args, _mappings) do
     chars = String.graphemes(buffer)
     char_count = chars |> Enum.count()
 
