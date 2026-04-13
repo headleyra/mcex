@@ -1,7 +1,10 @@
 defmodule Mcex.MixProject do
   use Mix.Project
+  require Logger
 
   def project do
+    Logger.warning("This repo is no longer being updated (please use https://github.com/headleyra/mx instead)\n")
+
     [
       app: :mcex,
       version: "0.104.1",

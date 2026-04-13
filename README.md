@@ -3,6 +3,7 @@
 **ModifyChain experiments and extras**
 
 ## Installation
+**NOTE: This repo is no longer being updated (please use https://github.com/headleyra/mx instead)**
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 by adding `mcex` to your list of dependencies in `mix.exs`:
